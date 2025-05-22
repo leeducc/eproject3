@@ -1,6 +1,8 @@
 ﻿namespace backend.Enums
 {
-    public class EmailVerificationStatus
+    public enum EmailVerification
     {
+        Verified,
+        Unverified
     }
 }

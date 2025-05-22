@@ -1,6 +1,9 @@
 ﻿namespace backend.Enums
 {
-    public class UserStatus
+    public enum UserStatus
     {
+        Active,
+        Inactive,
+        Banned
     }
 }

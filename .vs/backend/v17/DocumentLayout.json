@@ -1,0 +1,96 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\leeducc\\eproject3\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{818A02EE-DFF6-4DCE-87AD-5985820C90E5}|backend\\backend.csproj|d:\\leeducc\\eproject3\\backend\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{818A02EE-DFF6-4DCE-87AD-5985820C90E5}|backend\\backend.csproj|solutionrelative:backend\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{818A02EE-DFF6-4DCE-87AD-5985820C90E5}|backend\\backend.csproj|d:\\leeducc\\eproject3\\backend\\enums\\userstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{818A02EE-DFF6-4DCE-87AD-5985820C90E5}|backend\\backend.csproj|solutionrelative:backend\\enums\\userstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{818A02EE-DFF6-4DCE-87AD-5985820C90E5}|backend\\backend.csproj|d:\\leeducc\\eproject3\\backend\\enums\\userrole.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{818A02EE-DFF6-4DCE-87AD-5985820C90E5}|backend\\backend.csproj|solutionrelative:backend\\enums\\userrole.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{818A02EE-DFF6-4DCE-87AD-5985820C90E5}|backend\\backend.csproj|d:\\leeducc\\eproject3\\backend\\enums\\emailverification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{818A02EE-DFF6-4DCE-87AD-5985820C90E5}|backend\\backend.csproj|solutionrelative:backend\\enums\\emailverification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "UserStatus.cs",
+              "DocumentMoniker": "D:\\leeducc\\eproject3\\backend\\Enums\\UserStatus.cs",
+              "RelativeDocumentMoniker": "backend\\Enums\\UserStatus.cs",
+              "ToolTip": "D:\\leeducc\\eproject3\\backend\\Enums\\UserStatus.cs",
+              "RelativeToolTip": "backend\\Enums\\UserStatus.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-22T04:53:12.876Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UserRole.cs",
+              "DocumentMoniker": "D:\\leeducc\\eproject3\\backend\\Enums\\UserRole.cs",
+              "RelativeDocumentMoniker": "backend\\Enums\\UserRole.cs",
+              "ToolTip": "D:\\leeducc\\eproject3\\backend\\Enums\\UserRole.cs",
+              "RelativeToolTip": "backend\\Enums\\UserRole.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-22T04:53:12.344Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "EmailVerification.cs",
+              "DocumentMoniker": "D:\\leeducc\\eproject3\\backend\\Enums\\EmailVerification.cs",
+              "RelativeDocumentMoniker": "backend\\Enums\\EmailVerification.cs",
+              "ToolTip": "D:\\leeducc\\eproject3\\backend\\Enums\\EmailVerification.cs",
+              "RelativeToolTip": "backend\\Enums\\EmailVerification.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-22T04:53:11.409Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "WeatherForecastController.cs",
+              "DocumentMoniker": "D:\\leeducc\\eproject3\\backend\\Controllers\\WeatherForecastController.cs",
+              "RelativeDocumentMoniker": "backend\\Controllers\\WeatherForecastController.cs",
+              "ToolTip": "D:\\leeducc\\eproject3\\backend\\Controllers\\WeatherForecastController.cs",
+              "RelativeToolTip": "backend\\Controllers\\WeatherForecastController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-22T04:53:09.303Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

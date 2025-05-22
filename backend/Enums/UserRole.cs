@@ -1,6 +1,9 @@
 ﻿namespace backend.Enums
 {
-    public class Class
+    public enum UserRole
     {
+        Admin,
+        Staff,
+        Customer
     }
 }
