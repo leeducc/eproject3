@@ -12,13 +12,13 @@ export default () => {
         isActive ? "text-link-dark dark:text-link-dark" : "",
     ].join(" ")
 
-    return (<header className="border-b border-gray-200 dark:border-gray-800 pr-3">
+    return (<header className="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 pr-3 bg-white dark:bg-black">
         <div className="flex flex-wrap items-center">
             <div className="absolute z-10 top-2 left-2 sm:static flex-shrink flex-grow-0">
                 <div className="cursor-pointer">
                     <Link to="/" className="navbar-brand flex items-center">
                         <Logo className="w-8 h-8 sm:ml-2 sm:w-12 sm:h-12" title="eproject3 logo"/>
-                        <span className="hidden ml-2 sm:block text-2xl font-semibold">eproject3</span>
+                        <span className="hidden ml-2 sm:block text-2xl font-semibold">OnlineShopDVDs</span>
                     </Link>
                 </div>
             </div>
@@ -26,25 +26,16 @@ export default () => {
                 <nav className="relative flex flex-grow leading-6 font-semibold text-slate-700 dark:text-slate-200">
                     <ul className="flex flex-wrap items-center justify-end w-full m-0">
                         <li className="relative flex flex-wrap just-fu-start m-0">
-                            <NavLink to="/counter" className={navClass}>Counter</NavLink>
+                            <NavLink to="/" className={navClass}>Home</NavLink>
                         </li>
                         <li className="relative flex flex-wrap just-fu-start m-0">
-                            <NavLink to="/weather" className={navClass}>Weather</NavLink>
+                            <NavLink to="/news" className={navClass}>News</NavLink>
                         </li>
                         <li className="relative flex flex-wrap just-fu-start m-0">
-                            <NavLink to="/todomvc" className={navClass}>Todos</NavLink>
+                            <NavLink to="/forum" className={navClass}>Forum</NavLink>
                         </li>
                         <li className="relative flex flex-wrap just-fu-start m-0">
-                            <NavLink to="/bookings-crud" className={navClass}>Bookings</NavLink>
-                        </li>
-                        <li className="relative flex flex-wrap just-fu-start m-0">
-                            <NavLink to="/whatsnew" className={navClass}>What's New</NavLink>
-                        </li>
-                        <li className="relative flex flex-wrap just-fu-start m-0">
-                            <NavLink to="/blog" className={navClass}>Blog</NavLink>
-                        </li>
-                        <li className="relative flex flex-wrap just-fu-start m-0">
-                            <NavLink to="/videos" className={navClass}>Videos</NavLink>
+                            <NavLink to="/store" className={navClass}>Store</NavLink>
                         </li>
                         {auth
                             ? (<>
