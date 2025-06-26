@@ -4,10 +4,17 @@ using Microsoft.EntityFrameworkCore;
 using eproject3.Data;
 using eproject3.ServiceInterface;
 
+
 AppHost.RegisterKey();
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
+
+services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql( // or UseSqlServer, UseNpgsql, UseSqlite
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+    ));
 
 services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -28,7 +35,7 @@ services.AddDataProtection()
 // Add application services.
 services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 // Uncomment to send emails with SMTP, configure SMTP with "SmtpConfig" in appsettings.json
-// services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
+services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
 services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, AdditionalUserClaimsPrincipalFactory>();
 
 // Register all services
