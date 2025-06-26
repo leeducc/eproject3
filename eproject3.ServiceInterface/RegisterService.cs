@@ -64,7 +64,7 @@ public class RegisterService(UserManager<ApplicationUser> userManager, IEmailSen
         newUser.Email = request.Email;
 
         //TODO: Remove to use force email confirmation
-        //newUser.EmailConfirmed = emailNotSetup;
+        newUser.EmailConfirmed = emailNotSetup;
 
         var result = await UserManager.CreateAsync(newUser, request.Password);
         result.AssertSucceeded();

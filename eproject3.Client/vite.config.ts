@@ -25,6 +25,7 @@ const baseFolder =
         ? `${env.APPDATA}/ASP.NET/https`
         : `${env.HOME}/.aspnet/https`;
 
+// @ts-ignore
 const certificateArg = process.argv.map(arg => arg.match(/--name=(?<value>.+)/i)).filter(Boolean)[0];
 const certificateName = certificateArg ? certificateArg!.groups!.value : "eproject3.client";
 
@@ -101,7 +102,7 @@ export default defineConfig(async () => {
             Press({
                 baseUrl,
                 //Uncomment to generate metadata *.json 
-                //metadataPath: './public/api',
+                metadataPath: './public/api',
             }),
         ],
         resolve: {

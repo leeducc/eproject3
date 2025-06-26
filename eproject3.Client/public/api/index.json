@@ -1,0 +1,15 @@
+{
+    "blog": [
+        "https://locahost:5173/meta/2024/blog.json",
+        "https://locahost:5173/meta/2023/blog.json",
+        "https://locahost:5173/meta/2022/blog.json"
+    ],
+    "videos": [
+        "https://locahost:5173/meta/2024/videos.json",
+        "https://locahost:5173/meta/2022/videos.json",
+        "https://locahost:5173/meta/2023/videos.json"
+    ],
+    "whatsNew": [
+        "https://locahost:5173/meta/2023/whatsNew.json"
+    ]
+}
