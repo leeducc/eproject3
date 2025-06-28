@@ -1,0 +1,22 @@
+﻿[
+  { "id": 1, "title": "Dreammee", "artist": "Soobin Hoàng Sơn", "image": "/img/album.jpg", "price": 1200000, "category": "Vinyl" },
+  { "id": 2, "title": "Bình Yên", "artist": "Đen Vâu", "image": "/img/album.jpg", "price": 1050000, "category": "Vinyl" },
+  { "id": 3, "title": "Radio", "artist": "Hòa Minzy", "image": "/img/album.jpg", "price": 800000, "category": "CD" },
+  { "id": 4, "title": "Something Beautiful", "artist": "Ngọt", "image": "/img/album.jpg", "price": 1000000, "category": "Vinyl" },
+  { "id": 5, "title": "Close To What", "artist": "Tate McRae", "image": "/img/album.jpg", "price": 980000, "category": "Vinyl" },
+  { "id": 6, "title": "Angel Music Baby", "artist": "Gwen Stefani", "image": "/img/album.jpg", "price": 1350000, "category": "Vinyl" },
+  { "id": 7, "title": "American Idiot", "artist": "Green Day", "image": "/img/album.jpg", "price": 3200000, "category": "Vinyl" },
+  { "id": 8, "title": "Blue Album", "artist": "Weezer", "image": "/img/album.jpg", "price": 1100000, "category": "category1" },
+  { "id": 9, "title": "1989", "artist": "Taylor Swift", "image": "/img/album.jpg", "price": 1300000, "category": "category1" },
+  { "id": 10, "title": "30", "artist": "Adele", "image": "/img/album.jpg", "price": 1200000, "category": "Vinyl" },
+  { "id": 11, "title": "Parachutes", "artist": "Coldplay", "image": "/img/album.jpg", "price": 1150000, "category": "CD" },
+  { "id": 12, "title": "Divide", "artist": "Ed Sheeran", "image": "/img/album.jpg", "price": 1100000, "category": "CD" },
+  { "id": 13, "title": "Fine Line", "artist": "Harry Styles", "image": "/img/album.jpg", "price": 1250000, "category": "Vinyl" },
+  { "id": 14, "title": "Positions", "artist": "Ariana Grande", "image": "/img/album.jpg", "price": 1300000, "category": "CD" },
+  { "id": 15, "title": "Happier Than Ever", "artist": "Billie Eilish", "image": "/img/album.jpg", "price": 1350000, "category": "Vinyl" },
+  { "id": 16, "title": "24K Magic", "artist": "Bruno Mars", "image": "/img/album.jpg", "price": 1200000, "category": "Vinyl" },
+  { "id": 17, "title": "After Hours", "artist": "The Weeknd", "image": "/img/album.jpg", "price": 1300000, "category": "Vinyl" },
+  { "id": 18, "title": "Random Access Memories", "artist": "Daft Punk", "image": "/img/album.jpg", "price": 1400000, "category": "CD" },
+  { "id": 19, "title": "Hybrid Theory", "artist": "Linkin Park", "image": "/img/album.jpg", "price": 1150000, "category": "category1" },
+  { "id": 20, "title": "Songs About Jane", "artist": "Maroon 5", "image": "/img/album.jpg", "price": 1100000, "category": "category1" }
+]
