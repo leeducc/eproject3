@@ -6,10 +6,6 @@
   },
   "categories": ["Rock", "Pop", "Jazz", "Hip-Hop"],
   "featuredProducts": [
-    { "id": 1, "title": "Abbey Road", "price": 29.99, "image": "/img/abbey-road.jpg" },
-    { "id": 2, "title": "Thriller", "price": 24.99, "image": "/img/thriller.jpg" },
-    { "id": 3, "title": "Kind of Blue", "price": 19.99, "image": "/img/kind-of-blue.jpg" },
-    { "id": 4, "title": "The Chronic", "price": 22.99, "image": "/img/the-chronic.jpg" }
   ],
   "news": [
     { "id": 1, "title": "New Arrivals: Classic 90s Hip Hop", "summary": "Discover timeless tracks from the 90s hip hop scene." },
