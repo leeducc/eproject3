@@ -1,152 +1,124 @@
 import { Link } from "react-router-dom"
-import { Icon } from "@iconify/react"
 import Layout from "@/components/Layout"
-import GettingStarted from "@/components/GettingStarted"
-import Include from "@/components/Include"
-import VideoGroup from "@/components/VideoGroup"
-import LiteYouTube from "@/components/LiteYouTube"
-import SrcPage from "@/components/SrcPage"
-import { generateSlug, dateLabel, dateTimestamp } from "@/utils"
-import { PressContext } from "@/contexts"
-import { useContext } from "react"
 
 const Index = () => {
-    const press = useContext(PressContext)
-    const posts = press.blog.posts
-    const primaryPost = posts[0]
-    const postAuthor = primaryPost.author
-
-    function authorLink(name: any) {
-        return name && press.blog.authors.some((x: any) => x.name.toLowerCase() == name.toLowerCase())
-            ? `/posts/author/${generateSlug(name)}`
-            : null
-    }
-    function postLink(post: any) {
-        return `/posts/${post.slug}`
-    }
-    function author(name: string) {
-        return name ? press.blog.authors.filter((x: any) => x.name.toLowerCase() == name.toLowerCase())[0] : null
-    }
-    function authorProfileUrl(name: string) {
-        return author(name)?.profileUrl ?? "/img/profiles/user1.svg"
-    }
+    const slideLayout = (index: number) => {
+        const isEven = index % 2 === 0;
+        return (
+            <div key={index} className="flex-shrink-0 w-[320px] space-y-2">
+                {isEven ? (
+                    <>
+                        <img
+                            src={`https://via.placeholder.com/320x180/${Math.floor(Math.random()*16777215).toString(16)}/fff?text=Huge+DVD+${index + 1}`}
+                            className="w-full h-[180px] object-cover rounded shadow-lg"
+                            alt={`Huge DVD ${index + 1}`}
+                        />
+                        <div className="flex gap-2">
+                            <img
+                                src={`https://via.placeholder.com/150x150/${Math.floor(Math.random()*16777215).toString(16)}/fff?text=Small+DVD+1`}
+                                className="w-[150px] h-[150px] object-cover rounded shadow-md"
+                                alt="Small DVD"
+                            />
+                            <img
+                                src={`https://via.placeholder.com/150x150/${Math.floor(Math.random()*16777215).toString(16)}/fff?text=Small+DVD+2`}
+                                className="w-[150px] h-[150px] object-cover rounded shadow-md"
+                                alt="Small DVD"
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className="flex gap-2">
+                            <img
+                                src={`https://via.placeholder.com/150x150/${Math.floor(Math.random()*16777215).toString(16)}/fff?text=Small+DVD+1`}
+                                className="w-[150px] h-[150px] object-cover rounded shadow-md"
+                                alt="Small DVD"
+                            />
+                            <img
+                                src={`https://via.placeholder.com/150x150/${Math.floor(Math.random()*16777215).toString(16)}/fff?text=Small+DVD+2`}
+                                className="w-[150px] h-[150px] object-cover rounded shadow-md"
+                                alt="Small DVD"
+                            />
+                        </div>
+                        <img
+                            src={`https://via.placeholder.com/320x180/${Math.floor(Math.random()*16777215).toString(16)}/fff?text=Huge+DVD+${index + 1}`}
+                            className="w-full h-[180px] object-cover rounded shadow-lg"
+                            alt={`Huge DVD ${index + 1}`}
+                        />
+                    </>
+                )}
+            </div>
+        );
+    };
 
     return (
-        <Layout title="React SPA with Vite + TypeScript">
-            <div className="mx-auto mt-16 max-w-7xl px-4 sm:mt-24">
-                <div className="text-center">
-                    <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-5xl md:text-6xl">
-                        <span className="block xl:inline">Welcome to </span>
-                        <span className="block text-link-dark dark:text-link-dark xl:inline">React SPA</span>
-                    </h1>
-                    <p className="mx-auto mt-3 max-w-md text-base text-gray-500 dark:text-gray-400 sm:text-lg md:mt-5 md:max-w-3xl md:text-xl">
-                        Welcome to your new React SPA App
-                    </p>
-                    <div className="mx-auto mt-5 max-w-md sm:flex sm:justify-center md:mt-8">
-                        <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                            <Link to="https://ui.shadcn.com/docs/components/accordion"
-                                  className="flex w-full items-center justify-center rounded-md border border-transparent bg-link-dark dark:bg-link-dark px-8 py-3 text-base font-medium text-white hover:bg-gray-700 md:py-4 md:px-10 md:text-lg">
-                                React Component Gallery
-                            </Link>
-                        </div>
-                    </div>
+        <Layout title="Music DVD Store">
+            {/* Hero Section */}
+            <div className="relative bg-gray-900 text-white py-20">
+                <div className="container mx-auto px-6 text-center">
+                    <h1 className="text-5xl font-extrabold mb-6">Explore the World of Music on DVD</h1>
+                    <p className="text-xl mb-8">Classic albums, live concerts, and rare collector editions – all on disc.</p>
+                    <Link to="/shop" className="bg-white text-gray-900 px-6 py-3 rounded-md font-semibold shadow hover:bg-gray-200">
+                        Shop Now
+                    </Link>
                 </div>
+                <img src="https://via.placeholder.com/1200x400/111827/FFFFFF?text=Hero+Image" alt="DVD shelf" className="absolute top-0 left-0 w-full h-full object-cover opacity-10 pointer-events-none" />
             </div>
 
-            <section className="py-8 flex">
-                <div className="mt-8 mx-auto">
-                    <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl text-center">
-                        Getting Started
-                    </h2>
-                    <div>
-                        <GettingStarted template="react-spa"/>
+            {/* Featured DVDs - Horizontal Scroll */}
+            <section className="py-20 bg-white dark:bg-gray-900 overflow-hidden">
+                <div className="container mx-auto px-6">
+                    <h2 className="text-4xl font-bold text-center mb-12">Featured DVDs</h2>
+                    <div className="relative w-full overflow-x-auto">
+                        <div className="flex gap-6 animate-scroll-horizontal" style={{ animation: 'scroll 50s linear infinite' }}>
+                            {[...Array(10)].map((_, i) => slideLayout(i))}
+                        </div>
+                    </div>
+                    <style>{`
+                        @keyframes scroll {
+                            0% { transform: translateX(0); }
+                            100% { transform: translateX(-50%); }
+                        }
+                        .animate-scroll-horizontal {
+                            display: flex;
+                            animation: scroll 40s linear infinite;
+                        }
+                    `}</style>
+                </div>
+            </section>
+
+            {/* Featured Artists */}
+            <section className="py-20 bg-slate-100 dark:bg-slate-800">
+                <div className="container mx-auto px-6 text-center">
+                    <h2 className="text-4xl font-bold mb-12">Featured Artists</h2>
+                    <div className="overflow-x-auto flex gap-6 whitespace-nowrap">
+                        {[1, 2, 3, 4, 5, 6].map((artist) => (
+                            <div key={artist} className="inline-block w-48 flex-shrink-0">
+                                <img src={`https://via.placeholder.com/200x200/${Math.floor(Math.random()*16777215).toString(16)}/fff?text=Artist+${artist}`} className="rounded-full mx-auto mb-4 shadow-lg" alt={`Artist ${artist}`} />
+                                <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">Artist {artist}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
 
-            <div className="relative">
-                <div className="mt-8 max-w-6xl mx-auto">
-                    <div className="aspect-w-16 aspect-h-9 pb-24">
-                        <LiteYouTube id="WXLF0piz6G0" poster="maxresdefault"
-                                     title="Productive ASP.NET Core Vite React SPA Tailwind Template with Identity Auth"/>
-                    </div>
-                </div>
-            </div>
-
-            <div className="container mx-auto px-5 mb-24">
-                {!primaryPost ? null : <section>
-                    <div className="mb-8 md:mb-16">
-                        <div className="sm:mx-0">
-                            <Link aria-label={primaryPost.title} to={postLink(primaryPost)}>
-                                <img src={primaryPost.image} alt={`Cover Image for ${primaryPost.title}`}
-                                     className="shadow-sm hover:shadow-2xl transition-shadow duration-200"/>
+            {/* Partner Section */}
+            <section className="py-20 bg-white dark:bg-gray-900">
+                <div className="container mx-auto px-6">
+                    <h2 className="text-3xl font-bold mb-12">Connect to Our Partners</h2>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                        <img src="https://via.placeholder.com/500x300/222/fff?text=Partner+Banner" className="rounded shadow-xl" alt="Partner Banner" />
+                        <div className="text-center lg:text-left">
+                            <img src="https://via.placeholder.com/300x200/444/fff?text=Store+Preview" className="mx-auto lg:mx-0 rounded shadow" alt="Store Preview" />
+                            <Link to="/partner-store" className="mt-6 inline-block bg-gray-900 text-white px-6 py-3 rounded-md font-medium hover:bg-gray-700">
+                                Go to Store →
                             </Link>
                         </div>
                     </div>
-                    <div className="md:grid md:grid-cols-2 md:gap-x-16 lg:gap-x-8 mb-20 md:mb-28">
-                        <div>
-                            <h3 className="mb-4 text-4xl lg:text-6xl leading-tight">
-                                <Link className="hover:underline" to={postLink(primaryPost)}>{primaryPost.title}</Link>
-                            </h3>
-                            <div className="mb-4 md:mb-0 text-lg">
-                                <time dateTime={dateTimestamp(primaryPost.date)}>{dateLabel(primaryPost.date)}</time>
-                            </div>
-                        </div>
-                        <div>
-                            <p className="text-lg leading-relaxed mb-4">{primaryPost.summary}</p>
-                            {authorLink(primaryPost.author)
-                                ? <Link className="flex items-center text-xl font-bold"
-                                        to={authorLink(primaryPost.author)!}>
-                                    <img src={authorProfileUrl(primaryPost.author)}
-                                         className="w-12 h-12 rounded-full mr-4" alt="Author"/>
-                                    <span>{postAuthor}</span>
-                                </Link>
-                                : <span className="flex items-center text-xl font-bold">
-                                    <img src={authorProfileUrl(primaryPost.author)}
-                                         className="w-12 h-12 rounded-full mr-4" alt="Author"/>
-                                    <span>{postAuthor}</span>
-                                  </span>}
-                        </div>
-                    </div>
-                </section>}
-            </div>
-
-            <div className="flex justify-center my-20 py-20 bg-slate-100 dark:bg-slate-800">
-                <div className="text-center">
-                    <Icon icon="mdi:feature-highlight" className="text-link-dark w-36 h-36 inline-block"/>
-                    <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-12 text-center md:text-left">
-                        Features
-                    </h1>
                 </div>
-            </div>
-
-            <div className="text-center text-xl">
-                Opinionated React template for a productive out-of-the-box development UX
-            </div>
-            <div className="prose dark:prose-invert lg:prose-xl mx-auto">
-                <Include src="features.md"/>
-            </div>
-
-            <div className="flex justify-center my-20 py-20 bg-slate-100 dark:bg-slate-800">
-                <div className="text-center">
-                    <Icon icon="material-symbols:hangout-video" className="text-link-dark w-36 h-36 inline-block"/>
-                    <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-tight md:leading-none mb-12 text-center md:text-left">
-                        Videos
-                    </h1>
-                </div>
-            </div>
-
-            <VideoGroup
-                title="SPA Development"
-                summary="Learn about ServiceStack's productive features for rapidly developing Single Page Apps"
-                group="react"/>
-
-            <div className="my-8 flex justify-center gap-x-4">
-                <SrcPage path="index.tsx"/>
-            </div>
-
+            </section>
         </Layout>
-    )
-}
+    );
+};
 
-export default Index
+export default Index;

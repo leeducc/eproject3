@@ -15,7 +15,7 @@ public class ConfigureDbMigrations : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) => builder
         .ConfigureAppHost(appHost => {
-            var migrator = new Migrator(appHost.Resolve<IDbConnectionFactory>(), typeof(Migration1000).Assembly);
+            var migrator = new Migrator(appHost.Resolve<IDbConnectionFactory>(), typeof(Migration1003).Assembly);
             AppTasks.Register("migrate", _ =>
             {
                 var log = appHost.GetApplicationServices().GetRequiredService<ILogger<ConfigureDbMigrations>>();

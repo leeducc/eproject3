@@ -27,6 +27,18 @@ public class AppHost() : AppHostBase("eproject3"), IHostingStartup
 
         SetConfig(new HostConfig {
         });
+        
+        Plugins.Add(new CorsFeature(
+            allowOriginWhitelist: new[] {
+                "https://localhost:5173" // <-- allow your React dev server origin
+            },
+            allowCredentials: true,
+            allowedHeaders: "Content-Type,Authorization",
+            allowedMethods: "GET, POST, PUT, DELETE, OPTIONS"
+        ));
+        
+      
+        
     }
     
     // TODO: Replace with your own License Key. FREE Individual or OSS License available from: https://servicestack.net/free
