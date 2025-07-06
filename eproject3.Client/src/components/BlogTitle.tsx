@@ -7,7 +7,7 @@ type Props = {
 
 export default ({ heading }:Props) => {
     const press = useContext(PressContext)
-    const blogTitle = press.blog.config.blogTitle as string
+    const blogTitle = press.news.config.blogTitle as string
 
     return (<div className="text-center">
         <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50 sm:text-4xl">{blogTitle}</h2>

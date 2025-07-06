@@ -12,7 +12,7 @@ export default () => {
     const press = useContext(PressContext)
     const forYear = parseInt(useParams().year ?? '')
     const title = `${forYear} posts`
-    const allPosts = press.blog.posts
+    const allPosts = press.news.posts
     const allYears = [...new Set(allPosts.map(x => new Date(x.date).getFullYear()))]
     allYears.sort((a: number, b: number) => b - a)
     const yearPosts = allPosts.filter((x: any) => new Date(x.date).getFullYear() == forYear)

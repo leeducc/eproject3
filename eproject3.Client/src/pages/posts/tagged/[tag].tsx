@@ -13,9 +13,9 @@ export default () => {
     const press = useContext(PressContext)
     const { tag } = useParams()
 
-    const selectedTag = tag && press.blog.tagSlugs[tag]
+    const selectedTag = tag && press.news.tagSlugs[tag]
     const title = `${selectedTag} tagged posts`
-    const allPosts = press.blog.posts
+    const allPosts = press.news.posts
     const taggedPosts = selectedTag ? allPosts.filter(x => x.tags.includes(selectedTag)) : []
     const allTags = [...new Set(allPosts.flatMap(x => x.tags))]
     const tagCounts: { [tag: string]: number } = {}

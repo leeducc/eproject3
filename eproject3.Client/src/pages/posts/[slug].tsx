@@ -12,11 +12,11 @@ export default (): React.JSX.Element => {
     const press = useContext(PressContext)
 
     const { slug } = useParams()
-    const allPosts = press.blog.posts
+    const allPosts = press.news.posts
     const post = allPosts.find(x => x.slug == slug)
     const title = post?.title ?? "Post not found"
 
-    const author = post ? press.blog.authors.find(x => x.name.toLowerCase() == post.author?.toLowerCase()) : null
+    const author = post ? press.news.authors.find(x => x.name.toLowerCase() == post.author?.toLowerCase()) : null
     const authorPosts = author ? allPosts.filter(x => x.author?.toLowerCase() == author!.name.toLowerCase()).slice(0, 4) : []
     const authorProfileUrl = author?.profileUrl ?? "/img/profiles/user1.svg"
     const authorHref = author ? `/posts/author/${generateSlug(author.name)}` : null
@@ -28,7 +28,7 @@ export default (): React.JSX.Element => {
         return `/posts/tagged/${generateSlug(tag)}`
     }
     function authorLink(name: any) {
-        return name && press.blog.authors.some((x: any) => x.name.toLowerCase() == name.toLowerCase())
+        return name && press.news.authors.some((x: any) => x.name.toLowerCase() == name.toLowerCase())
             ? `/posts/author/${generateSlug(name)}`
             : null
     }

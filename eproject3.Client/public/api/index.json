@@ -1,5 +1,6 @@
 {
     "blog": [
+        "https://locahost:5173/meta/2025/blog.json",
         "https://locahost:5173/meta/2024/blog.json",
         "https://locahost:5173/meta/2023/blog.json",
         "https://locahost:5173/meta/2022/blog.json"

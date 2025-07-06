@@ -12,9 +12,10 @@ type Props = {}
 export default ({ }: Props) => {
 
     const press = useContext(PressContext)
-    const title = press.blog.config.blogTitle
-    const blogDescription = press.blog.config.blogDescription
-    const allPosts = press.blog.posts
+
+    const title = press.news.config.blogTitle
+    const blogDescription = press.news.config.blogDescription
+    const allPosts = press.news.posts
     const allYears = [...new Set(allPosts.map((x: any) => new Date(x.date).getFullYear()) as number[])]
     const allTags = [...new Set(allPosts.flatMap((x: any) => x.tags) as string[])]
     const tagCounts: { [tag: string]: number } = {}

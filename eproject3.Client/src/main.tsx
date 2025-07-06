@@ -15,13 +15,15 @@ import press from "virtual:press"
 import { PressContext } from './contexts'
 import { useApp } from "@/gateway";
 
+(press as any).news = press.blog
+
 useApp().load()
 
 function App() {
     return (
         <Suspense fallback={<Layout><Loading className='p-4'></Loading></Layout>}>
             <ThemeProvider defaultTheme="light" storageKey="color-scheme">
-                <PressContext.Provider value={press}>
+                <PressContext.Provider value={press as any}>
                     {useRoutes(routes)}
                 </PressContext.Provider>
             </ThemeProvider>

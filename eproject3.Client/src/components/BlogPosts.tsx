@@ -12,7 +12,7 @@ export default ({posts}: Props) => {
     const press = useContext(PressContext)
 
     function authorLink(name: any) {
-        return name && press.blog.authors.some(x => x.name.toLowerCase() == name.toLowerCase())
+        return name && press.news.authors.some(x => x.name.toLowerCase() == name.toLowerCase())
             ? `/posts/author/${generateSlug(name)}`
             : null
     }
@@ -22,7 +22,7 @@ export default ({posts}: Props) => {
     }
 
     function author(name: string) {
-        return name ? press.blog.authors.find(x => x.name.toLowerCase() == name.toLowerCase()) : undefined
+        return name ? press.news.authors.find(x => x.name.toLowerCase() == name.toLowerCase()) : undefined
     }
 
     function authorProfileUrl(name: string) {

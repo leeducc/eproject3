@@ -1,0 +1,20 @@
+[
+    {
+        "slug": "sample-news",
+        "fileName": "sample-news.md",
+        "date": "2025-05-10",
+        "tags": [
+            "công nghệ",
+            "xu hướng",
+            "AI",
+            "năm 2025"
+        ],
+        "wordCount": 300,
+        "lineCount": 26,
+        "title": "Top 5 Xu Hướng Công Nghệ Đáng Chú Ý Năm 2025",
+        "summary": "Từ AI đến vật liệu thông minh, đây là 5 xu hướng công nghệ bạn nên theo dõi trong năm 2025.",
+        "author": "Lucy Bates",
+        "image": "https://locahost:5173/img/posts/tech-trends-2025.jpg",
+        "url": "https://locahost:5173/posts/sample-news"
+    }
+]

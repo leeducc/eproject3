@@ -12,8 +12,8 @@ import Layout from "@/components/Layout"
 export default () => {
     const press = useContext(PressContext)
     const { name } = useParams()
-    const author = press.blog.authors.find(x => generateSlug(x.name) == name)
-    const authorPosts = author ? press.blog.posts.filter(x => x.author.toLowerCase() == author.name.toLowerCase()) : []
+    const author = press.news.authors.find(x => generateSlug(x.name) == name)
+    const authorPosts = author ? press.news.posts.filter(x => x.author.toLowerCase() == author.name.toLowerCase()) : []
     const title = author ? `${author.name}'s Posts` : `Author Not Found`
 
     return (
