@@ -162,6 +162,12 @@ namespace eproject3.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
@@ -177,6 +183,9 @@ namespace eproject3.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("FirstName")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Gender")
                         .HasColumnType("longtext");
 
                     b.Property<string>("LastName")

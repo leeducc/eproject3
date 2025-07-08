@@ -43,6 +43,9 @@ public class ProductService : Service
         if (!string.IsNullOrEmpty(request.Query))
             q.Where(x => x.Title.Contains(request.Query) || x.Artist.Contains(request.Query));
 
+        if (request.HeroSection == true) // ✅ added
+            q.Where(x => x.HeroSection == true);
+
         if (request.SortBy == "asc")
             q.OrderBy(x => x.Price);
         else if (request.SortBy == "desc")
@@ -53,7 +56,7 @@ public class ProductService : Service
         int offset = (request.Page - 1) * request.PageSize;
         q.Limit(offset, request.PageSize);
 
-
         return await Db.SelectAsync(q);
     }
+
 }

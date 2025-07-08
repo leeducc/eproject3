@@ -63,7 +63,7 @@ public class RegisterService(UserManager<ApplicationUser> userManager, IEmailSen
         newUser.UserName ??= newUser.Email;
         newUser.Email = request.Email;
 
-        //TODO: Remove to use force email confirmation
+        
         newUser.EmailConfirmed = emailNotSetup;
 
         var result = await UserManager.CreateAsync(newUser, request.Password);

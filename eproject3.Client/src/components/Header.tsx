@@ -29,7 +29,7 @@ export default () => {
                             <NavLink to="/" className={navClass}>Home</NavLink>
                         </li>
                         <li className="relative flex flex-wrap just-fu-start m-0">
-                            <NavLink to="/news" className={navClass}>News</NavLink>
+                            <NavLink to="/posts/tagged/github-actions" className={navClass}>New</NavLink>
                         </li>
                         <li className="relative flex flex-wrap just-fu-start m-0">
                             <NavLink to="/forum" className={navClass}>Forum</NavLink>

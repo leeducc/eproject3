@@ -12,7 +12,7 @@ namespace eproject3.Migrations;
 
 public class Migration1000 : MigrationBase
 {
-    // Declare schema (do NOT reuse App DTOs)
+    [Alias("products")]
     public class Product
     {
         [AutoIncrement]

@@ -17,6 +17,9 @@ public class CreateProduct : IReturn<Product>
     public decimal Price { get; set; }
     public string Category { get; set; }
     public string Description { get; set; } 
+    public bool HeroSection { get; set; } = false;
+
+    public string YoutubeTrailerLink { get; set; }
 }
 
 // Update
@@ -30,6 +33,9 @@ public class UpdateProduct : IReturn<Product>
     public decimal Price { get; set; }
     public string Category { get; set; }
     public string Description { get; set; } 
+    public bool HeroSection { get; set; } = false;
+
+    public string YoutubeTrailerLink { get; set; }
 }
 
 // Delete
@@ -55,4 +61,6 @@ public class SearchProducts : IReturn<List<Product>>
     public string? SortBy { get; set; }    // "asc", "desc", "newest"
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 20;
+
+    public bool? HeroSection { get; set; } // ✅ added
 }

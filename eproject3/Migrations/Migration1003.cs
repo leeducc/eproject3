@@ -8,9 +8,10 @@ using System.ComponentModel;
 
 public class Migration1003 : MigrationBase
 {
+    [Alias("products")]
     public class Product
     {
-        [StringLength(1000)] // Adjust max length as needed
+        [StringLength(1000)] 
         public string Description { get; set; }
     }
 

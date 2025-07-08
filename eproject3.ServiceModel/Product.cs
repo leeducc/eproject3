@@ -15,4 +15,7 @@ public class Product
     public decimal Price { get; set; }
     public string Category { get; set; }
     public string Description { get; set; } 
+    public bool HeroSection { get; set; } = false;
+
+    public string YoutubeTrailerLink { get; set; }
 }
