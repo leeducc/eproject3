@@ -1,6 +1,7 @@
-﻿import {useEffect, useState} from "react";
+﻿import { useEffect, useState } from "react";
 import Layout from "@/components/Layout";
-import {Link, useLocation} from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "@/useAuth";
 
 type ForumPost = {
     title: string;
@@ -15,6 +16,7 @@ const POSTS_PER_PAGE = 9;
 
 export default function Forum() {
     const location = useLocation();
+    const { auth } = useAuth();
     const [posts, setPosts] = useState<ForumPost[]>([]);
     const [filteredChannel, setFilteredChannel] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -40,7 +42,7 @@ export default function Forum() {
     }, [location.search]);
 
     useEffect(() => {
-        window.scrollTo({top: 0, behavior: "smooth"});
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }, [currentPage]);
 
     const channels = Array.from(new Set(posts.map((p) => p.channel)));
@@ -133,69 +135,71 @@ export default function Forum() {
                 </aside>
 
                 <main className="w-full md:w-3/4 pl-0 md:pl-6 order-1 md:order-2">
-                    <div className="mb-6 border border-gray-200 rounded-xl px-5 py-4 bg-white shadow-sm">
-                        {!isCreating ? (
-                            <div
-                                className="text-gray-500 cursor-text text-sm px-1 py-2 rounded hover:bg-gray-50 transition"
-                                onClick={() => setIsCreating(true)}
-                            >
-                                What do you want to post?
-                            </div>
-                        ) : (
-                            <div className="space-y-4 animate-fade-in">
-                                <input
-                                    type="text"
-                                    placeholder="Title"
-                                    value={newPostTitle}
-                                    onChange={(e) => setNewPostTitle(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    autoFocus
-                                />
-                                <textarea
-                                    placeholder="What's on your mind?"
-                                    value={newPostContent}
-                                    onChange={(e) => setNewPostContent(e.target.value)}
-                                    rows={4}
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                ></textarea>
-                                <div className="flex justify-end space-x-2">
-                                    <button
-                                        onClick={() => {
-                                            if (!newPostTitle.trim() || !newPostContent.trim()) return;
-
-                                            const newPost = {
-                                                title: newPostTitle,
-                                                content: newPostContent,
-                                                author: "You",
-                                                channel: "General",
-                                                date: new Date().toISOString().split("T")[0],
-                                                review: 0
-                                            };
-
-                                            setPosts([newPost, ...posts]);
-                                            setVoteStates([null, ...voteStates]);
-                                            setNewPostTitle("");
-                                            setNewPostContent("");
-                                            setIsCreating(false);
-                                        }}
-                                        className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition"
-                                    >
-                                        Submit
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setIsCreating(false);
-                                            setNewPostTitle("");
-                                            setNewPostContent("");
-                                        }}
-                                        className="px-4 py-2 border border-gray-300 text-sm rounded-md hover:bg-gray-100 transition"
-                                    >
-                                        Cancel
-                                    </button>
+                    {auth && (
+                        <div className="mb-6 border border-gray-200 rounded-xl px-5 py-4 bg-white shadow-sm">
+                            {!isCreating ? (
+                                <div
+                                    className="text-gray-500 cursor-text text-sm px-1 py-2 rounded hover:bg-gray-50 transition"
+                                    onClick={() => setIsCreating(true)}
+                                >
+                                    What do you want to post?
                                 </div>
-                            </div>
-                        )}
-                    </div>
+                            ) : (
+                                <div className="space-y-4 animate-fade-in">
+                                    <input
+                                        type="text"
+                                        placeholder="Title"
+                                        value={newPostTitle}
+                                        onChange={(e) => setNewPostTitle(e.target.value)}
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        autoFocus
+                                    />
+                                    <textarea
+                                        placeholder="What's on your mind?"
+                                        value={newPostContent}
+                                        onChange={(e) => setNewPostContent(e.target.value)}
+                                        rows={4}
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    ></textarea>
+                                    <div className="flex justify-end space-x-2">
+                                        <button
+                                            onClick={() => {
+                                                if (!newPostTitle.trim() || !newPostContent.trim()) return;
+
+                                                const newPost = {
+                                                    title: newPostTitle,
+                                                    content: newPostContent,
+                                                    author: auth.userName ?? "You",
+                                                    channel: "General",
+                                                    date: new Date().toISOString().split("T")[0],
+                                                    review: 0
+                                                };
+
+                                                setPosts([newPost, ...posts]);
+                                                setVoteStates([null, ...voteStates]);
+                                                setNewPostTitle("");
+                                                setNewPostContent("");
+                                                setIsCreating(false);
+                                            }}
+                                            className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition"
+                                        >
+                                            Submit
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                setIsCreating(false);
+                                                setNewPostTitle("");
+                                                setNewPostContent("");
+                                            }}
+                                            className="px-4 py-2 border border-gray-300 text-sm rounded-md hover:bg-gray-100 transition"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     <div className="space-y-4">
                         {paginatedPosts.map((post, idx) => {

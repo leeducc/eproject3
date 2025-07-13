@@ -1,6 +1,7 @@
 ﻿import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { useAuth } from "@/useAuth"; // ✅ Thêm dòng này
 
 type Post = {
     title: string;
@@ -20,6 +21,8 @@ type Comment = {
 };
 
 export default function ForumPost() {
+    const { auth } = useAuth(); // ✅ Lấy thông tin người dùng đăng nhập
+
     const [post, setPost] = useState<Post | null>(null);
     const [comments, setComments] = useState<Comment[]>([]);
     const [channels, setChannels] = useState<string[]>([]);
@@ -37,6 +40,9 @@ export default function ForumPost() {
     const params = new URLSearchParams(location.search);
     const id = parseInt(params.get("id") || "0", 10);
     const selectedChannel = params.get("channel");
+
+    // ✅ State cho việc thêm comment
+    const [newComment, setNewComment] = useState("");
 
     useEffect(() => {
         fetch("/forum.json")
@@ -153,6 +159,45 @@ export default function ForumPost() {
                     </div>
 
                     <h2 className="text-lg font-semibold mb-3">Comments ({comments.length})</h2>
+
+                    {/* Comment form only if signed in */}
+                    {auth ? (
+                        <div className="mb-6">
+                            <textarea
+                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="Write your comment..."
+                                rows={3}
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                            />
+                            <div className="flex justify-end mt-2">
+                                <button
+                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                                    onClick={() => {
+                                        if (!newComment.trim()) return;
+                                        const newEntry: Comment = {
+                                            postId: id,
+                                            author: auth.userName || "You",
+                                            datetime: new Date().toLocaleString(),
+                                            content: newComment.trim(),
+                                            review: 0,
+                                        };
+                                        setComments([...comments, newEntry]);
+                                        setCommentVoteStates([...commentVoteStates, null]);
+                                        setReviewStates([...reviewStates, 0]);
+                                        setNewComment("");
+                                        setCommentPage(totalCommentPages); // auto scroll to last page
+                                    }}
+                                >
+                                    Post Comment
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="text-sm text-gray-500 mb-6">
+                            You must <Link to="/signin" className="text-blue-600 underline">sign in</Link> to comment.
+                        </p>
+                    )}
 
                     {paginatedComments.map((comment, i) => {
                         const actualIndex = (commentPage - 1) * COMMENTS_PER_PAGE + i;

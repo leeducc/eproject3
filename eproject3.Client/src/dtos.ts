@@ -414,6 +414,8 @@ export class AuthenticateResponse implements IHasSessionId, IHasBearerToken
     // @DataMember(Order=13)
     public meta: { [index: string]: string; };
 
+    gender?: "Male" | "Female" | "Not Set";
+
     public constructor(init?: Partial<AuthenticateResponse>) { (Object as any).assign(this, init); }
 }
 
