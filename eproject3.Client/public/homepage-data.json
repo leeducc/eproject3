@@ -1,0 +1,15 @@
+﻿{
+  "heroBanner": {
+    "title": "Summer Vinyl Sale!",
+    "subtitle": "Up to 50% off on classic albums",
+    "image": "/img/banner.jpg"
+  },
+  "categories": ["Rock", "Pop", "Jazz", "Hip-Hop"],
+  "featuredProducts": [
+  ],
+  "news": [
+    { "id": 1, "title": "New Arrivals: Classic 90s Hip Hop", "summary": "Discover timeless tracks from the 90s hip hop scene." },
+    { "id": 2, "title": "Vinyl Cleaning Tips", "summary": "Keep your records sounding fresh with these tips." },
+    { "id": 3, "title": "Upcoming Vinyl Fairs", "summary": "Join us at upcoming vinyl collector fairs this summer." }
+  ]
+}

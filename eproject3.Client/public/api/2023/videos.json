@@ -1,0 +1,17 @@
+[
+    {
+        "slug": "modern",
+        "fileName": "modern.md",
+        "date": "2023-02-08",
+        "tags": [
+            "vue",
+            "razor"
+        ],
+        "wordCount": 46,
+        "lineCount": 4,
+        "title": "Modern Razor Pages & MVC .NET Tailwind templates",
+        "url": "https://youtu.be/SyppvQB7IPs",
+        "order": 4,
+        "group": "react"
+    }
+]
