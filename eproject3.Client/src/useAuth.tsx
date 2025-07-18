@@ -67,14 +67,14 @@ export type AuthenticatedContext = AuthContext & {
 }
 
 type Props = {}
-export function useAuth({}: Props = {}) : OptionalAuthContext {
+export function useAuth({}: Props = {}) : OptionalAuthContext & { user?: { id: number } } {
   const { data:auth, mutate:revalidate, error } = useSWR(KEY, _ =>
       client.post(new Authenticate()))
   const { cache } = useSWRConfig()
   const loading = error === undefined && auth === undefined
   const signedIn = error === undefined && auth !== undefined
   const navigate = useNavigate()
-
+  const user = auth?.userId ? { id: parseInt(auth.userId) } : undefined;
   let attrs:string[] = !loading && auth ? [
     'auth',
     ...(auth?.roles || []).map(role => `role:${role}`),
@@ -94,5 +94,5 @@ export function useAuth({}: Props = {}) : OptionalAuthContext {
   const hasRole = (role:string) => (auth?.roles || []).indexOf(role) >= 0 || isAdmin()
   const hasPermission = (permission:string) => (auth?.permissions || []).indexOf(permission) >= 0 || isAdmin()
 
-  return { auth, signedIn, attrs, loading, signout, revalidate, hasRole, hasPermission }
+  return { auth, signedIn, attrs, loading, user, signout, revalidate, hasRole, hasPermission }
 }

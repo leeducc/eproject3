@@ -11,10 +11,6 @@ public class MyServices : Service
         return new HelloResponse { Result = $"Hello, {request.Name}!" };
     }
     
-    static readonly string[] summaries = [
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    ];
-
-    
+   
     
 }

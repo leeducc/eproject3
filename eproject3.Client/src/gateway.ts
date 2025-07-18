@@ -14,6 +14,7 @@ import { useState } from "react"
 import useSWR from "swr"
 import { ApiState } from "@/components/Form.tsx"
 
+
 export const Routes = {
     signin: (redirectTo?:string) => redirectTo ? `/signin?redirect=${redirectTo}` : `/signin`,
     forbidden: () => '/forbidden',
@@ -25,7 +26,8 @@ export function apiUrl(path:string) {
     return combinePaths(API_URL,path)
 }
 
-export const client = new JsonServiceClient()
+export const client = new JsonServiceClient("https://localhost:5001")
+client.credentials = "include";
 
 export type ErrorArgs = {
     message:string
@@ -51,7 +53,7 @@ export type ClientContext = ApiState & {
 export function useClient() : ClientContext {
     const [error, setStatus] = useState<ResponseStatus|undefined>()
     const [loading, setLoading] = useState(false)
-
+    
     const clearErrors = () => setStatus(undefined)
     
     const setError = ({ message, errorCode, fieldName, errors } : ErrorArgs) => {

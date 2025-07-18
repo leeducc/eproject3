@@ -1,0 +1,82 @@
+﻿[
+  {
+    "title": "Cách sử dụng Tailwind trong dự án React",
+    "author": "Alice Nguyen",
+    "channel": "General",
+    "date": "2025-07-08",
+    "content": "Tailwind là một công cụ tuyệt vời để xây dựng UI nhanh chóng. Với cách viết utility-first, bạn có thể dễ dàng kiểm soát bố cục, màu sắc, padding, margin... Ví dụ: thay vì tạo file CSS riêng, bạn có thể dùng class trực tiếp như 'bg-blue-500 text-white p-4'. Điều này giúp giảm thời gian phát triển, nhưng cũng cần lưu ý đến việc tái sử dụng và tổ chức cấu trúc component hợp lý.",
+    "review": 3
+  },
+  {
+    "title": "Giới thiệu forum mới của chúng ta",
+    "author": "Bob Tran",
+    "channel": "News",
+    "date": "2025-07-07",
+    "content": "Chúng tôi rất vui mừng được giới thiệu phiên bản mới của forum! Giao diện được làm lại hoàn toàn bằng Tailwind CSS, hiệu suất tốt hơn và trải nghiệm người dùng được cải thiện. Hãy thử đăng bài và đóng góp ý kiến để cải tiến thêm nhé!",
+    "review": 5
+  },
+  {
+    "title": "Làm sao để sửa lỗi CORS khi dùng API?",
+    "author": "Linh Ngo",
+    "channel": "Help & Support",
+    "date": "2025-07-06",
+    "content": "Mình đang gặp lỗi CORS khi gọi API từ frontend (localhost:3000) đến backend (localhost:5000). Mình đã thử thêm header nhưng vẫn bị chặn. Ai từng xử lý qua vấn đề này giúp mình với. Cảm ơn rất nhiều!",
+    "review": -1
+  },
+  {
+    "title": "Tổng hợp tài nguyên học React miễn phí",
+    "author": "Dana Le",
+    "channel": "General",
+    "date": "2025-07-05",
+    "content": "Chia sẻ một số nguồn học React cực hay: 1. reactjs.org (official docs), 2. Full course trên freeCodeCamp (YouTube), 3. Scrimba interactive lessons, 4. Frontend Masters. Mọi người có thêm nguồn nào hãy chia sẻ dưới bài viết nhé!",
+    "review": 4
+  },
+  {
+    "title": "Thảo luận: Có nên dùng TypeScript không?",
+    "author": "Emily Vu",
+    "channel": "Suggestions",
+    "date": "2025-07-05",
+    "content": "TypeScript giúp phát hiện lỗi sớm, đặc biệt khi làm việc nhóm hoặc dự án lớn. Tuy nhiên, cú pháp dài dòng có thể gây nản cho người mới. Bạn có dùng TypeScript không? Tại sao có hoặc tại sao không?",
+    "review": 0
+  },
+  {
+    "title": "Forum đã đạt 10,000 thành viên!",
+    "author": "Charlie Pham",
+    "channel": "News",
+    "date": "2025-07-04",
+    "content": "🎉 Một cột mốc quan trọng cho cộng đồng chúng ta: 10,000 thành viên đã tham gia và chia sẻ kiến thức mỗi ngày. Cảm ơn tất cả mọi người đã đồng hành. Tiếp tục phát triển mạnh nhé!",
+    "review": 2
+  },
+  {
+    "title": "Tạo modal trong React như thế nào?",
+    "author": "Minh Do",
+    "channel": "Help & Support",
+    "date": "2025-07-03",
+    "content": "Mình muốn tạo modal mở lên khi nhấn nút, có cách nào làm sạch và dễ quản lý không? Mình đang dùng Tailwind và chưa rõ cách kết hợp với React để quản lý state và animation.",
+    "review": 1
+  },
+  {
+    "title": "Bạn đang dùng IDE nào?",
+    "author": "Hanh Bui",
+    "channel": "Off Topic",
+    "date": "2025-07-02",
+    "content": "Một câu hỏi vui: mọi người dùng IDE gì cho lập trình frontend? VS Code, WebStorm, hoặc gì khác? Mình thấy VS Code nhẹ và đủ dùng nhưng nhiều người khen WebStorm. Bạn chọn cái nào?",
+    "review": -2
+  },
+  {
+    "title": "Đề xuất thêm chủ đề Vue",
+    "author": "Khoa Dang",
+    "channel": "Suggestions",
+    "date": "2025-07-01",
+    "content": "Forum hiện tại chưa có nơi chuyên về Vue.js. Mình nghĩ nên có channel riêng cho Vue để các bạn học framework này có nơi chia sẻ, đặt câu hỏi và học hỏi.",
+    "review": 3
+  },
+  {
+    "title": "Nghỉ xả hơi cuối tuần 😌",
+    "author": "Thanh Pham",
+    "channel": "Off Topic",
+    "date": "2025-06-30",
+    "content": "Cuối tuần rồi, mọi người có kế hoạch gì không? Mình định đi trekking hoặc về quê thư giãn vài ngày. Nhớ dành thời gian nghỉ ngơi sau một tuần code vất vả nhé!",
+    "review": 1
+  }
+]

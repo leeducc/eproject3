@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react"
+import { ChangeEvent } from "react"
 import { ErrorResponse, errorResponse, errorResponseExcept, ResponseStatus, humanize, toPascalCase } from "@servicestack/client"
 import React, {
     FC,
@@ -342,3 +343,29 @@ export const Loading : FC<LoadingProps> = ({ className, icon, text }) => {
     <span className="ml-1 text-gray-400">{showText}</span>
   </div>)
 }
+
+
+interface Props {
+    id: string
+    label?: string
+    value?: string
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void
+    max?: string
+    min?: string
+}
+
+export const DateInput = ({ id, label, value, onChange, max, min }: Props) => (
+    <div className="flex flex-col gap-1">
+        {label && <label htmlFor={id} className="font-medium">{label}</label>}
+        <input
+            type="date"
+            id={id}
+            name={id}
+            value={value}
+            onChange={onChange}
+            max={max}
+            min={min}
+            className="form-input"
+        />
+    </div>
+)

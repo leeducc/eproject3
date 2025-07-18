@@ -1,59 +1,66 @@
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
+using ServiceStack.Auth;
+using ServiceStack.OrmLite;
+using ServiceStack.Data;
 using eproject3.Data;
 using eproject3.ServiceInterface;
-
+using eproject3.ServiceModel;
+using System.IO;
 
 AppHost.RegisterKey();
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 
-services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql( // or UseSqlServer, UseNpgsql, UseSqlite
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
-    ));
+// Use your MySQL connection string here
+var dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-services.AddDatabaseDeveloperPageExceptionFilter();
+// Setup OrmLite connection factory for MySQL
+var dbFactory = new OrmLiteConnectionFactory(
+    dbConnectionString,
+    MySqlDialect.Provider);
 
-services.AddAuthorization();
-services.AddIdentity<ApplicationUser, IdentityRole>(options => {
-        //options.User.AllowedUserNameCharacters = null;
-        options.SignIn.RequireConfirmedAccount = true;
-    })
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddSignInManager()
-    .AddDefaultTokenProviders();
+// Setup OrmLite Auth repository with your CustomUser and UserAuthDetails
+var authRepo = new OrmLiteAuthRepository<CustomUser, UserAuthDetails>(dbFactory)
+{
+    UseDistinctRoleTables = true
+};
+authRepo.InitSchema();
 
-services.ConfigureApplicationCookie(options => options.DisableRedirectsForApis());
+// Register OrmLite connection factory and Auth repository in DI container
+services.AddSingleton<IDbConnectionFactory>(dbFactory);
+services.AddSingleton<IAuthRepository>(authRepo);
+services.AddSingleton<IUserAuthRepository>(authRepo);
 
-services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo("App_Data"));
 
-// Add application services.
-services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-// Uncomment to send emails with SMTP, configure SMTP with "SmtpConfig" in appsettings.json
-services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
-services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, AdditionalUserClaimsPrincipalFactory>();
+// Configure CORS if needed
+services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("https://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
-// Register all services
+// Register ServiceStack services
 services.AddServiceStack(typeof(MyServices).Assembly);
+
 
 var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseMigrationsEndPoint();
-    
-    // Serve static files from the /public/img directory during development
-    app.MapGet("/img/{**path}", async (string path, HttpContext ctx) => {
+
+    // Serve static img files from client during dev
+    app.MapGet("/img/{**path}", async (string path, HttpContext ctx) =>
+    {
         var file = Path.GetFullPath($"{app.Environment.ContentRootPath}/../eproject3.Client/public/img/{path}");
         if (File.Exists(file))
         {
@@ -69,19 +76,18 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowFrontend");
+
+
+
+app.UseServiceStack(new AppHost());
+
+
 app.MapFallbackToFile("/index.html");
-
-app.UseAuthorization();
-
-app.UseServiceStack(new AppHost(), options =>
-{
-    options.MapEndpoints();
-});
 
 app.Run();

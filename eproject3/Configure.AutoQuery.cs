@@ -19,7 +19,7 @@ public class ConfigureAutoQuery : IHostingStartup
             // For Bookings https://docs.servicestack.net/autoquery-crud-bookings
             services.AddPlugin(new AutoQueryFeature {
                  MaxLimit = 1000,
-                 IncludeTotal = true,
+                 //IncludeTotal = true,
             });
         })
         .ConfigureAppHost(appHost => {

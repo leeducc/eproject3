@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+
 using ServiceStack.Jobs;
 using eproject3.Data;
 using eproject3.ServiceInterface;
@@ -30,19 +30,19 @@ public class ConfigureBackgroundJobs : IHostingStartup
 
             // Log if EmailSender is enabled and SmtpConfig missing
             var log = services.GetRequiredService<ILogger<ConfigureBackgroundJobs>>();
-            var emailSender = services.GetRequiredService<IEmailSender<ApplicationUser>>();
-            if (emailSender is EmailSender)
-            {
-                var smtpConfig = services.GetService<SmtpConfig>();
-                if (smtpConfig is null)
-                {
-                    log.LogWarning("SMTP is not configured, please configure SMTP to enable sending emails");
-                }
-                else
-                {
-                    log.LogWarning("SMTP is configured with <{FromEmail}> {FromName}", smtpConfig.FromEmail, smtpConfig.FromName);
-                }
-            }
+            // var emailSender = services.GetRequiredService<IEmailSender<ApplicationUser>>();
+            // if (emailSender is EmailSender)
+            // {
+            //     var smtpConfig = services.GetService<SmtpConfig>();
+            //     if (smtpConfig is null)
+            //     {
+            //         log.LogWarning("SMTP is not configured, please configure SMTP to enable sending emails");
+            //     }
+            //     else
+            //     {
+            //         log.LogWarning("SMTP is configured with <{FromEmail}> {FromName}", smtpConfig.FromEmail, smtpConfig.FromName);
+            //     }
+            // }
             
             var jobs = services.GetRequiredService<IBackgroundJobs>();
             // Example of registering a Recurring Job to run Every Hour
@@ -67,24 +67,24 @@ public class JobsHostedService(ILogger<JobsHostedService> log, IBackgroundJobs j
 /// <summary>
 /// Sends emails by executing SendEmailCommand in a background job where it's serially processed by 'smtp' worker
 /// </summary>
-public class EmailSender(IBackgroundJobs jobs) : IEmailSender<ApplicationUser>
-{
-    public Task SendEmailAsync(string email, string subject, string htmlMessage)
-    {
-        jobs.EnqueueCommand<SendEmailCommand>(new SendEmail {
-            To = email,
-            Subject = subject,
-            BodyHtml = htmlMessage,
-        });
-        return Task.CompletedTask;
-    }
-
-    public Task SendConfirmationLinkAsync(ApplicationUser user, string email, string confirmationLink) =>
-        SendEmailAsync(email, "Confirm your email", $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>.");
-
-    public Task SendPasswordResetLinkAsync(ApplicationUser user, string email, string resetLink) =>
-        SendEmailAsync(email, "Reset your password", $"Please reset your password by <a href='{resetLink}'>clicking here</a>.");
-
-    public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, string resetCode) =>
-        SendEmailAsync(email, "Reset your password", $"Please reset your password using the following code: {resetCode}");
-}
+// public class EmailSender(IBackgroundJobs jobs) : IEmailSender<ApplicationUser>
+// {
+//     public Task SendEmailAsync(string email, string subject, string htmlMessage)
+//     {
+//         jobs.EnqueueCommand<SendEmailCommand>(new SendEmail {
+//             To = email,
+//             Subject = subject,
+//             BodyHtml = htmlMessage,
+//         });
+//         return Task.CompletedTask;
+//     }
+//
+//     public Task SendConfirmationLinkAsync(ApplicationUser user, string email, string confirmationLink) =>
+//         SendEmailAsync(email, "Confirm your email", $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>.");
+//
+//     public Task SendPasswordResetLinkAsync(ApplicationUser user, string email, string resetLink) =>
+//         SendEmailAsync(email, "Reset your password", $"Please reset your password by <a href='{resetLink}'>clicking here</a>.");
+//
+//     public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, string resetCode) =>
+//         SendEmailAsync(email, "Reset your password", $"Please reset your password using the following code: {resetCode}");
+// }
