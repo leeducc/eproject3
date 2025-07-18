@@ -1,21 +1,23 @@
-﻿using ServiceStack.DataAnnotations;
+﻿// ServiceModel/Types/Highlight.cs
+using ServiceStack.DataAnnotations;
 
-
-namespace eproject3.ServiceModel;
-
-[Alias("Highlights")]
-public class Highlight
+namespace eproject3.ServiceModel.Types
 {
-    [AutoIncrement]
-    public int    Id        { get; set; }
+    [Alias("highlights")]
+    public class Highlight
+    {
+        [AutoIncrement]
+        public int    Id         { get; set; }
 
-    
-    public string Route     { get; set; }   
+        [Required]
+        public int    CategoryId { get; set; }   
 
-    
-    public string ImageUrl  { get; set; }   
-   
-    public string Link      { get; set; }   
-    [Required]
-    public int    SortOrder { get; set; }   
+        [Required]
+        public string ImageUrl   { get; set; }  
+
+        public string Link       { get; set; }   
+
+        [Required]
+        public int    SortOrder  { get; set; }   
+    }
 }

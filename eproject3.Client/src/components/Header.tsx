@@ -52,7 +52,7 @@ export default function NavHeader() {
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/news" className={navClass}>
+                            <NavLink to="/posts" className={navClass}>
                                 News
                             </NavLink>
                         </li>

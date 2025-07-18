@@ -3,25 +3,62 @@ using ServiceStack;
 using ServiceStack.OrmLite;
 using eproject3.ServiceModel;
 using eproject3.ServiceModel.Types;
-using System.Linq;
 
 namespace eproject3.ServiceInterface
 {
     public class HighlightService : Service
     {
-        // GET /api/highlights?route=/music
-        public object Get(QueryHighlights request)
+        // GET /api/highlights?categoryId=1
+        public object Get(QueryHighlights req)
         {
-            // Select up to 3 highlights for this route, in SortOrder
             var q = Db.From<Highlight>()
-                .Where(x => x.Route == request.Route)
-                .OrderBy(x => x.SortOrder)
+                .Where(h => h.CategoryId == req.CategoryId)
+                .OrderBy(h => h.SortOrder)
                 .Limit(3);
 
-            var results = Db.Select(q);
             return new QueryHighlightsResponse {
-                Results = results
+                Results = Db.Select(q)
             };
+        }
+
+        // GET /api/highlights/{Id}
+        public object Get(GetHighlight req)
+        {
+            return Db.SingleById<Highlight>(req.Id)
+                   ?? throw HttpError.NotFound($"Highlight {req.Id} not found");
+        }
+
+        // POST /api/highlights
+        [Authenticate]
+        [RequiredRole("Admin")]
+        public object Post(CreateHighlight req)
+        {
+            var h = req.ConvertTo<Highlight>();
+            Db.Insert(h);
+            h.Id = (int)Db.LastInsertId();
+            return h;
+        }
+
+        // PUT /api/highlights/{Id}
+        [Authenticate]
+        [RequiredRole("Admin")]
+        public object Put(UpdateHighlight req)
+        {
+            var h = Db.SingleById<Highlight>(req.Id)
+                    ?? throw HttpError.NotFound($"Highlight {req.Id} not found");
+
+            h.PopulateWith(req);
+            Db.Update(h);
+            return h;
+        }
+
+        // DELETE /api/highlights/{Id}
+        [Authenticate]
+        [RequiredRole("Admin")]
+        public void Delete(DeleteHighlight req)
+        {
+            if (Db.DeleteById<Highlight>(req.Id) == 0)
+                throw HttpError.NotFound($"Highlight {req.Id} not found");
         }
     }
 }

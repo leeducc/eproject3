@@ -2,8 +2,8 @@
   "localBaseUrl": "http://localhost:5173",
   "publicBaseUrl": "https://react-spa.servicestack.net",
   "siteTwitter": "@React",
-  "blogTitle": "From the blog",
-  "blogDescription": "Writing on software design and aerospace industry.",
+  "blogTitle": "News",
+  "blogDescription": "Writing on latest entertainment news.",
   "blogEmail": "email@example.org (React)",
   "blogImageUrl": "https://servicestack.net/img/logo.png"
 }

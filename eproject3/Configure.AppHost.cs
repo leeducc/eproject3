@@ -6,7 +6,7 @@ using eproject3.ServiceModel;
 using ServiceStack.Data;
 using ServiceStack.IO;
 using ServiceStack.FluentValidation;
-
+using ServiceStack.Text; 
 [assembly: HostingStartup(typeof(eproject3.AppHost))]
 
 namespace eproject3;
@@ -33,6 +33,10 @@ public class AppHost() : AppHostBase("eproject3"), IHostingStartup
     
     public override void Configure()
     {
+        
+        JsConfig.EmitCamelCaseNames = true;
+        JsConfig.DateHandler = DateHandler.ISO8601;
+        JsConfig.AssumeUtc   = true;
         TypeScriptGenerator.InsertTsNoCheck = true;
 
         SetConfig(new HostConfig {

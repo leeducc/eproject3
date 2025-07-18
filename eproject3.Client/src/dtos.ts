@@ -1,5 +1,5 @@
 /* Options:
-Date: 2025-07-18 17:04:55
+Date: 2025-07-21 08:01:09
 Version: 8.80
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: https://localhost:5001
@@ -135,6 +135,45 @@ export class OrderDto
     public constructor(init?: Partial<OrderDto>) { (Object as any).assign(this, init); }
 }
 
+// @DataContract
+export class ResponseError
+{
+    // @DataMember(Order=1)
+    public errorCode: string;
+
+    // @DataMember(Order=2)
+    public fieldName: string;
+
+    // @DataMember(Order=3)
+    public message: string;
+
+    // @DataMember(Order=4)
+    public meta: { [index:string]: string; };
+
+    public constructor(init?: Partial<ResponseError>) { (Object as any).assign(this, init); }
+}
+
+// @DataContract
+export class ResponseStatus
+{
+    // @DataMember(Order=1)
+    public errorCode: string;
+
+    // @DataMember(Order=2)
+    public message: string;
+
+    // @DataMember(Order=3)
+    public stackTrace: string;
+
+    // @DataMember(Order=4)
+    public errors: ResponseError[];
+
+    // @DataMember(Order=5)
+    public meta: { [index:string]: string; };
+
+    public constructor(init?: Partial<ResponseStatus>) { (Object as any).assign(this, init); }
+}
+
 export class CollectionItemDto
 {
     public productId: number;
@@ -144,18 +183,6 @@ export class CollectionItemDto
     public addedAt: string;
 
     public constructor(init?: Partial<CollectionItemDto>) { (Object as any).assign(this, init); }
-}
-
-export class Highlight
-{
-    public id: number;
-    public route: string;
-    public imageUrl: string;
-    public link: string;
-    // @Required()
-    public sortOrder: number;
-
-    public constructor(init?: Partial<Highlight>) { (Object as any).assign(this, init); }
 }
 
 export class Promotion
@@ -213,45 +240,6 @@ export class ProductView extends Product
     public averageRating?: number;
 
     public constructor(init?: Partial<ProductView>) { super(init); (Object as any).assign(this, init); }
-}
-
-// @DataContract
-export class ResponseError
-{
-    // @DataMember(Order=1)
-    public errorCode: string;
-
-    // @DataMember(Order=2)
-    public fieldName: string;
-
-    // @DataMember(Order=3)
-    public message: string;
-
-    // @DataMember(Order=4)
-    public meta: { [index:string]: string; };
-
-    public constructor(init?: Partial<ResponseError>) { (Object as any).assign(this, init); }
-}
-
-// @DataContract
-export class ResponseStatus
-{
-    // @DataMember(Order=1)
-    public errorCode: string;
-
-    // @DataMember(Order=2)
-    public message: string;
-
-    // @DataMember(Order=3)
-    public stackTrace: string;
-
-    // @DataMember(Order=4)
-    public errors: ResponseError[];
-
-    // @DataMember(Order=5)
-    public meta: { [index:string]: string; };
-
-    public constructor(init?: Partial<ResponseStatus>) { (Object as any).assign(this, init); }
 }
 
 // @DataContract
@@ -425,6 +413,30 @@ export class GetOrdersResponse
     public constructor(init?: Partial<GetOrdersResponse>) { (Object as any).assign(this, init); }
 }
 
+export class AuthorDto
+{
+    public id: number;
+    public name: string;
+    public slug: string;
+    public email: string;
+    public bio: string;
+    public profileUrl: string;
+    public twitterUrl: string;
+    public threadsUrl: string;
+    public gitHubUrl: string;
+    public mastodonUrl: string;
+
+    public constructor(init?: Partial<AuthorDto>) { (Object as any).assign(this, init); }
+}
+
+export class GetAuthorsResponse
+{
+    public results: AuthorDto[] = [];
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<GetAuthorsResponse>) { (Object as any).assign(this, init); }
+}
+
 export class Category
 {
     public id: number;
@@ -550,6 +562,22 @@ export class QueryGenresResponse
     public constructor(init?: Partial<QueryGenresResponse>) { (Object as any).assign(this, init); }
 }
 
+export class Highlight
+{
+    public id: number;
+    // @Required()
+    public categoryId: number;
+
+    // @Required()
+    public imageUrl: string;
+
+    public link: string;
+    // @Required()
+    public sortOrder: number;
+
+    public constructor(init?: Partial<Highlight>) { (Object as any).assign(this, init); }
+}
+
 export class QueryHighlightsResponse
 {
     public results: Highlight[] = [];
@@ -562,6 +590,33 @@ export class HelloResponse
     public result: string;
 
     public constructor(init?: Partial<HelloResponse>) { (Object as any).assign(this, init); }
+}
+
+export class NewsDto
+{
+    public id: number;
+    public slug: string;
+    public title: string;
+    public summary: string;
+    public image: string;
+    public date: string;
+    public contentPath: string;
+    public wordCount: number;
+    public minutesToRead: number;
+    public authorId: number;
+    public authorName: string;
+    public authorProfileUrl: string;
+    public tags: string[] = [];
+
+    public constructor(init?: Partial<NewsDto>) { (Object as any).assign(this, init); }
+}
+
+export class GetNewsResponse
+{
+    public results: NewsDto[] = [];
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<GetNewsResponse>) { (Object as any).assign(this, init); }
 }
 
 export class Post
@@ -697,6 +752,22 @@ export class GetReviewsResponse
     public total: number;
 
     public constructor(init?: Partial<GetReviewsResponse>) { (Object as any).assign(this, init); }
+}
+
+export class Tag
+{
+    public id: number;
+    public name: string;
+
+    public constructor(init?: Partial<Tag>) { (Object as any).assign(this, init); }
+}
+
+export class GetTagsResponse
+{
+    public results: Tag[] = [];
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<GetTagsResponse>) { (Object as any).assign(this, init); }
 }
 
 // @DataContract
@@ -899,6 +970,67 @@ export class CancelOrder implements IReturnVoid
     public constructor(init?: Partial<CancelOrder>) { (Object as any).assign(this, init); }
     public getTypeName() { return 'CancelOrder'; }
     public getMethod() { return 'POST'; }
+    public createResponse() {}
+}
+
+// @Route("/api/authors", "GET")
+// @Route("/api/authors/{Id}", "GET")
+export class GetAuthors implements IReturn<GetAuthorsResponse>
+{
+    public id?: number;
+    public nameSlug?: string;
+
+    public constructor(init?: Partial<GetAuthors>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'GetAuthors'; }
+    public getMethod() { return 'GET'; }
+    public createResponse() { return new GetAuthorsResponse(); }
+}
+
+// @Route("/api/authors", "POST")
+export class CreateAuthor implements IReturn<AuthorDto>
+{
+    public name: string;
+    public email: string;
+    public bio: string;
+    public profileUrl: string;
+    public twitterUrl: string;
+    public threadsUrl: string;
+    public gitHubUrl: string;
+    public mastodonUrl: string;
+
+    public constructor(init?: Partial<CreateAuthor>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'CreateAuthor'; }
+    public getMethod() { return 'POST'; }
+    public createResponse() { return new AuthorDto(); }
+}
+
+// @Route("/api/authors/{Id}", "PUT")
+export class UpdateAuthor implements IReturn<AuthorDto>
+{
+    public id: number;
+    public name?: string;
+    public email?: string;
+    public bio?: string;
+    public profileUrl?: string;
+    public twitterUrl?: string;
+    public threadsUrl?: string;
+    public gitHubUrl?: string;
+    public mastodonUrl?: string;
+
+    public constructor(init?: Partial<UpdateAuthor>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'UpdateAuthor'; }
+    public getMethod() { return 'PUT'; }
+    public createResponse() { return new AuthorDto(); }
+}
+
+// @Route("/api/authors/{Id}", "DELETE")
+export class DeleteAuthor implements IReturnVoid
+{
+    public id: number;
+
+    public constructor(init?: Partial<DeleteAuthor>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'DeleteAuthor'; }
+    public getMethod() { return 'DELETE'; }
     public createResponse() {}
 }
 
@@ -1279,12 +1411,63 @@ export class DeleteGenre implements IReturnVoid
 // @Route("/api/highlights", "GET")
 export class QueryHighlights implements IReturn<QueryHighlightsResponse>
 {
-    public route: string;
+    public categoryId: number;
 
     public constructor(init?: Partial<QueryHighlights>) { (Object as any).assign(this, init); }
     public getTypeName() { return 'QueryHighlights'; }
     public getMethod() { return 'GET'; }
     public createResponse() { return new QueryHighlightsResponse(); }
+}
+
+// @Route("/api/highlights/{Id}", "GET")
+export class GetHighlight implements IReturn<Highlight>
+{
+    public id: number;
+
+    public constructor(init?: Partial<GetHighlight>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'GetHighlight'; }
+    public getMethod() { return 'GET'; }
+    public createResponse() { return new Highlight(); }
+}
+
+// @Route("/api/highlights", "POST")
+export class CreateHighlight implements IReturn<Highlight>
+{
+    public categoryId: number;
+    public imageUrl: string;
+    public link: string;
+    public sortOrder: number;
+
+    public constructor(init?: Partial<CreateHighlight>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'CreateHighlight'; }
+    public getMethod() { return 'POST'; }
+    public createResponse() { return new Highlight(); }
+}
+
+// @Route("/api/highlights/{Id}", "PUT")
+export class UpdateHighlight implements IReturn<Highlight>
+{
+    public id: number;
+    public categoryId: number;
+    public imageUrl: string;
+    public link: string;
+    public sortOrder: number;
+
+    public constructor(init?: Partial<UpdateHighlight>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'UpdateHighlight'; }
+    public getMethod() { return 'PUT'; }
+    public createResponse() { return new Highlight(); }
+}
+
+// @Route("/api/highlights/{Id}", "DELETE")
+export class DeleteHighlight implements IReturnVoid
+{
+    public id: number;
+
+    public constructor(init?: Partial<DeleteHighlight>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'DeleteHighlight'; }
+    public getMethod() { return 'DELETE'; }
+    public createResponse() {}
 }
 
 // @Route("/hello/{Name}")
@@ -1296,6 +1479,75 @@ export class Hello implements IReturn<HelloResponse>, IGet
     public getTypeName() { return 'Hello'; }
     public getMethod() { return 'GET'; }
     public createResponse() { return new HelloResponse(); }
+}
+
+// @Route("/api/NewsDto", "GET")
+// @Route("/api/NewsDto/{Id}", "GET")
+export class GetNews implements IReturn<GetNewsResponse>
+{
+    public id?: number;
+    public slug?: string;
+    public authorId?: number;
+    public authorSlug?: string;
+    public tag?: string;
+    public year?: number;
+
+    public constructor(init?: Partial<GetNews>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'GetNews'; }
+    public getMethod() { return 'GET'; }
+    public createResponse() { return new GetNewsResponse(); }
+}
+
+// @Route("/api/NewsDto", "POST")
+export class CreateNews implements IReturn<NewsDto>
+{
+    public title: string;
+    public slug: string;
+    public summary: string;
+    public authorId: number;
+    public image: string;
+    public date: string;
+    public contentPath: string;
+    public wordCount: number;
+    public minutesToRead: number;
+    public tagIds: number[] = [];
+
+    public constructor(init?: Partial<CreateNews>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'CreateNews'; }
+    public getMethod() { return 'POST'; }
+    public createResponse() { return new NewsDto(); }
+}
+
+// @Route("/api/NewsDto/{Id}", "PUT")
+export class UpdateNews implements IReturn<NewsDto>
+{
+    public id: number;
+    public title?: string;
+    public slug?: string;
+    public summary?: string;
+    public authorId?: number;
+    public image?: string;
+    public date?: string;
+    public contentPath?: string;
+    public wordCount?: number;
+    public minutesToRead?: number;
+    public tagIds?: number[];
+
+    public constructor(init?: Partial<UpdateNews>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'UpdateNews'; }
+    public getMethod() { return 'PUT'; }
+    public createResponse() { return new NewsDto(); }
+}
+
+// @Route("/api/NewsDto/{Id}", "DELETE")
+export class DeleteNews implements IReturnVoid
+{
+    public id: number;
+
+    public constructor(init?: Partial<DeleteNews>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'DeleteNews'; }
+    public getMethod() { return 'DELETE'; }
+    public createResponse() {}
 }
 
 // @Route("/api/posts", "GET")
@@ -1567,6 +1819,52 @@ export class GetReviews implements IReturn<GetReviewsResponse>
     public getTypeName() { return 'GetReviews'; }
     public getMethod() { return 'GET'; }
     public createResponse() { return new GetReviewsResponse(); }
+}
+
+// @Route("/api/tags", "GET")
+// @Route("/api/tags/{Id}", "GET")
+export class GetTags implements IReturn<GetTagsResponse>
+{
+    public id?: number;
+
+    public constructor(init?: Partial<GetTags>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'GetTags'; }
+    public getMethod() { return 'GET'; }
+    public createResponse() { return new GetTagsResponse(); }
+}
+
+// @Route("/api/tags", "POST")
+export class CreateTag implements IReturn<Tag>
+{
+    public name: string;
+
+    public constructor(init?: Partial<CreateTag>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'CreateTag'; }
+    public getMethod() { return 'POST'; }
+    public createResponse() { return new Tag(); }
+}
+
+// @Route("/api/tags/{Id}", "PUT")
+export class UpdateTag implements IReturn<Tag>
+{
+    public id: number;
+    public name: string;
+
+    public constructor(init?: Partial<UpdateTag>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'UpdateTag'; }
+    public getMethod() { return 'PUT'; }
+    public createResponse() { return new Tag(); }
+}
+
+// @Route("/api/tags/{Id}", "DELETE")
+export class DeleteTag implements IReturnVoid
+{
+    public id: number;
+
+    public constructor(init?: Partial<DeleteTag>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'DeleteTag'; }
+    public getMethod() { return 'DELETE'; }
+    public createResponse() {}
 }
 
 // @Route("/api/posts/{PostId}/vote", "POST")

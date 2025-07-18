@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Authentication;
 using ServiceStack.Auth;
 using ServiceStack.OrmLite;
 using ServiceStack.Data;
-using eproject3.Data;
 using eproject3.ServiceInterface;
 using eproject3.ServiceModel;
-using System.IO;
+using Microsoft.AspNetCore.StaticFiles;       
+using Microsoft.Extensions.FileProviders;    
+
 
 AppHost.RegisterKey();
 
@@ -51,8 +51,19 @@ services.AddServiceStack(typeof(MyServices).Assembly);
 
 var app = builder.Build();
 
-app.UseDefaultFiles();
+
 app.UseStaticFiles();
+var provider = new FileExtensionContentTypeProvider();
+
+provider.Mappings[".mdx"] = "text/markdown";
+
+
+app.UseStaticFiles(new StaticFileOptions {
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "wwwroot", "news")),
+    RequestPath  = "/news",
+    ContentTypeProvider = provider
+});
 
 if (app.Environment.IsDevelopment())
 {
