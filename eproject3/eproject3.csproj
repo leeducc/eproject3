@@ -23,15 +23,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Bogus" Version="35.6.3" />
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.*" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.*" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.*" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
-    <PackageReference Include="ServiceStack" Version="8.8.0" />
+    <PackageReference Include="ServiceStack" Version="8.*" />
+    <PackageReference Include="ServiceStack.Authentication.OAuth2" Version="5.14.0" />
+    <PackageReference Include="ServiceStack.Authentication.OpenId" Version="5.14.0" />
+    <PackageReference Include="ServiceStack.OrmLite" Version="8.8.0" />
     <PackageReference Include="ServiceStack.OrmLite.MySql" Version="8.8.0" />
-    <PackageReference Include="ServiceStack.OrmLite.MySqlConnector" Version="8.8.0" />
     <PackageReference Include="ServiceStack.Server" Version="8.8.0" />
     <PackageReference Include="ServiceStack.Ormlite.Sqlite.Data" Version="8.*" />
     <PackageReference Include="ServiceStack.Jobs" Version="8.*" />
@@ -46,6 +49,14 @@
   <ItemGroup>
     <ProjectReference Include="..\eproject3.ServiceInterface\eproject3.ServiceInterface.csproj" />
     <ProjectReference Include="..\eproject3.ServiceModel\eproject3.ServiceModel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\images\products\banners\herosection.jpg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\products\banners\storeherosection.jpg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\products\profiles\user1.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\products\profiles\user2.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\images\products\profiles\user3.svg" />
   </ItemGroup>
 
   <Target Name="CreateWwwrootFolderBuild" AfterTargets="AfterBuild">

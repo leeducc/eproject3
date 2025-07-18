@@ -4,9 +4,6 @@ using ServiceStack;
 using ServiceStack.Data;
 using ServiceStack.DataAnnotations;
 using ServiceStack.OrmLite;
-using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using eproject3.Data;
 
 [assembly: HostingStartup(typeof(eproject3.ConfigureDb))]
 
@@ -16,20 +13,13 @@ public class ConfigureDb : IHostingStartup
 {
     public void Configure(IWebHostBuilder builder) => builder
         .ConfigureServices((context, services) => {
-            var connectionString = context.Configuration.GetConnectionString("DefaultConnection")
-                                   ?? "Server=localhost;Database=eproject3db;User=root;Password=12345678;";
-            
             services.AddSingleton<IDbConnectionFactory>(new OrmLiteConnectionFactory(
-                connectionString, MySqlDialect.Provider));
-
-            // $ dotnet ef migrations add CreateIdentitySchema
-            // $ dotnet ef database update
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString),
-                    b => b.MigrationsAssembly(nameof(eproject3))));
-
+                context.Configuration.GetConnectionString("DefaultConnection")
+                ?? "Server=localhost;User Id=test;Password=test;Database=test;Pooling=true;MinPoolSize=0;MaxPoolSize=200",
+                MySqlDialect.Provider));
+        })
+        .ConfigureAppHost(appHost => {
             // Enable built-in Database Admin UI at /admin-ui/database
-            services.AddPlugin(new AdminDatabaseFeature());
+            // appHost.Plugins.Add(new AdminDatabaseFeature());
         });
 }
-

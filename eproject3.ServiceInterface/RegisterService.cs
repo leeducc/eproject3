@@ -1,9 +1,6 @@
-using System.Text;
-using System.Text.Encodings.Web;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
-using eproject3.Data;
+
 using eproject3.ServiceModel;
+using eproject3.ServiceModel.Types;
 using ServiceStack;
 using ServiceStack.Auth;
 using ServiceStack.Text;
@@ -11,105 +8,117 @@ using ServiceStack.FluentValidation;
 
 namespace eproject3.ServiceInterface;
 
-public class IdentityRegistrationValidator : AbstractValidator<Register>
+public class RegisterExtendedValidator : AbstractValidator<RegisterExtended>
 {
-    public IdentityRegistrationValidator()
+    public RegisterExtendedValidator()
     {
         RuleSet(ApplyTo.Post, () =>
         {
             RuleFor(x => x.Password).NotEmpty();
+
             RuleFor(x => x.ConfirmPassword)
                 .Equal(x => x.Password)
-                .When(x => x.ConfirmPassword != null)
-                .WithErrorCode(nameof(ErrorMessages.PasswordsShouldMatch))
-                .WithMessage(ErrorMessages.PasswordsShouldMatch.Localize(base.Request));
-            RuleFor(x => x.UserName).NotEmpty().When(x => x.Email.IsNullOrEmpty());
-            RuleFor(x => x.Email).NotEmpty().EmailAddress().When(x => x.UserName.IsNullOrEmpty());
+                .When(x => !string.IsNullOrEmpty(x.ConfirmPassword))
+                .WithErrorCode("PasswordsShouldMatch")
+                .WithMessage("Passwords must match");
+
             RuleFor(x => x.UserName)
-                .MustAsync(async (x, token) =>
-                {
-                    var userManager = Request.TryResolve<UserManager<ApplicationUser>>();
-                    return await userManager.FindByEmailAsync(x).ConfigAwait() == null;
-                })
-                .WithErrorCode("AlreadyExists")
-                .WithMessage(ErrorMessages.UsernameAlreadyExists.Localize(base.Request))
-                .When(x => !x.UserName.IsNullOrEmpty());
+                .NotEmpty()
+                .When(x => string.IsNullOrEmpty(x.Email));
+
             RuleFor(x => x.Email)
-                .MustAsync(async (x, token) =>
+                .NotEmpty()
+                .EmailAddress()
+                .When(x => string.IsNullOrEmpty(x.UserName));
+
+            RuleFor(x => x.UserName)
+                .MustAsync(async (userName, cancellation) =>
                 {
-                    var userManager = Request.TryResolve<UserManager<ApplicationUser>>();
-                    return await userManager.FindByEmailAsync(x).ConfigAwait() == null;
+                    var userAuthRepo = HostContext.AppHost.TryResolve<IUserAuthRepository>();
+                    if (userAuthRepo == null)
+                        return true;
+
+                    var existingUser = await Task.FromResult(userAuthRepo.GetUserAuthByUserName(userName));
+                    return existingUser == null;
                 })
                 .WithErrorCode("AlreadyExists")
-                .WithMessage(ErrorMessages.EmailAlreadyExists.Localize(base.Request))
-                .When(x => !x.Email.IsNullOrEmpty());
+                .WithMessage("Username already exists")
+                .When(x => !string.IsNullOrEmpty(x.UserName));
+
+            RuleFor(x => x.Email)
+                .MustAsync(async (email, cancellation) =>
+                {
+                    var userAuthRepo = HostContext.AppHost.TryResolve<IUserAuthRepository>();
+                    if (userAuthRepo == null)
+                        return true;
+
+                    // Check if any user exists with this email or username == email
+                    var existingByUserName = await Task.FromResult(userAuthRepo.GetUserAuthByUserName(email));
+                    var existingByEmail = await Task.FromResult(userAuthRepo.GetUserAuthByUserName(email)); // Or create method GetUserAuthByEmail if you have one
+                    return existingByUserName == null && existingByEmail == null;
+                })
+                .WithErrorCode("AlreadyExists")
+                .WithMessage("Email already exists")
+                .When(x => !string.IsNullOrEmpty(x.Email));
+
+            RuleFor(x => x.BirthDate)
+                .NotEmpty()
+                .Must(birthDate => birthDate.HasValue && birthDate.Value.AddYears(15) <= DateTime.UtcNow)
+                .WithMessage("You must be at least 15 years old");
+
+            RuleFor(x => x.PhoneNumber)
+                .NotEmpty()
+                .Matches(@"^\d{10,13}$")
+                .WithMessage("Phone number must be between 10 and 13 digits");
+
+            RuleFor(x => x.Gender)
+                .NotEmpty()
+                .Must(g => g == "Male" || g == "Female" || g == "Other")
+                .WithMessage("Gender must be Male, Female, or Other");
+
+            RuleFor(x => x.Country).NotEmpty();
+            RuleFor(x => x.City).NotEmpty();
+            RuleFor(x => x.Address).NotEmpty();
         });
     }
 }
 
-public class RegisterService(UserManager<ApplicationUser> userManager, IEmailSender<ApplicationUser> emailSender, AppConfig appConfig)
-    : IdentityRegisterServiceBase<ApplicationUser>(userManager)
+
+public class RegisterService(IUserAuthRepository authRepo) : Service
 {
-    string AppBaseUrl => appConfig.AppBaseUrl ?? Request.GetBaseUrl();
-    string ApiBaseUrl => appConfig.ApiBaseUrl ?? Request.GetBaseUrl();
-    private string AppErrorUrl => AppBaseUrl.CombineWith("/error");
-
-    public async Task<object> PostAsync(Register request)
+    public async Task<object> Post(RegisterExtended request)
     {
-        var emailNotSetup = emailSender is IdentityNoOpEmailSender;
-        var authCtx = AuthContext;
-        
-        var newUser = request.ConvertTo<ApplicationUser>();
-        newUser.UserName ??= newUser.Email;
-        newUser.Email = request.Email;
+        if (authRepo.GetUserAuthByUserName(request.Email) != null)
+            throw HttpError.Conflict("Email already exists");
 
-        
-        newUser.EmailConfirmed = emailNotSetup;
-
-        var result = await UserManager.CreateAsync(newUser, request.Password);
-        result.AssertSucceeded();
-
-        var session = authCtx.UserToSessionConverter(newUser);
-        await RegisterNewUserAsync(session, newUser);
-
-        var userId = await UserManager.GetUserIdAsync(newUser);
-        var code = await UserManager.GenerateEmailConfirmationTokenAsync(newUser);
-        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-        var callbackUrl = ApiBaseUrl.CombineWith(new ConfirmEmail
+        var user = new CustomUser
         {
-            UserId = userId,
-            Code = code,
-            ReturnUrl = Request.GetReturnUrl()
-        }.ToGetUrl());
+            UserName = request.UserName ?? request.Email,
+            Email = request.Email,
+            BirthDate = request.BirthDate,
+            Address = request.Address,
+            Gender = request.Gender,
+            PhoneNumber = request.PhoneNumber,
+            City = request.City,
+            Country = request.Country,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            DisplayName = $"{request.FirstName} {request.LastName}".Trim()
+        };
 
-        await emailSender.SendConfirmationLinkAsync(newUser, newUser.Email, HtmlEncoder.Default.Encode(callbackUrl));
+        var userId = authRepo.CreateUserAuth(user, request.Password);
 
-        var response = await CreateRegisterResponse(session,
-            request.UserName ?? request.Email, request.Password, request.AutoLogin);
-        
-        if (response is RegisterResponse registerResponse)
+        var createdUser = authRepo.GetUserAuth(userId.ToString());
+
+        // ✅ Automatically assign the "User" role
+        authRepo.AssignRoles(createdUser, roles: new[] { "User" });
+
+        return new RegisterResponse
         {
-            var signupConfirmUrl = AppBaseUrl.CombineWith("/signup-confirm");
-            if (emailNotSetup)
-                signupConfirmUrl = signupConfirmUrl.AddQueryParam("confirmLink", callbackUrl);
-
-            registerResponse.RedirectUrl = signupConfirmUrl;
-        }
-        
-        return response;
-    }
-
-    public async Task<object> Any(ConfirmEmail request)
-    {
-        var user = await UserManager.FindByIdAsync(request.UserId);
-        if (user == null)
-            return HttpResult.Redirect(AppErrorUrl.AddQueryParam("message", "User not found"));
-
-        var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
-        var result = await UserManager.ConfirmEmailAsync(user, code);
-        if (!result.Succeeded)
-            return HttpResult.Redirect(AppErrorUrl.AddQueryParam("message", "Error confirming your email."));
-
-        return HttpResult.Redirect(AppBaseUrl.CombineWith(request.ReturnUrl ?? "/signin"));
+            UserId = userId.ToString(),
+            UserName = createdUser.UserName,
+            ReferrerUrl = Request.GetParam("returnUrl") ?? "/",
+        };
     }
 }
+

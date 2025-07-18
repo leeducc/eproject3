@@ -25,7 +25,6 @@ const baseFolder =
         ? `${env.APPDATA}/ASP.NET/https`
         : `${env.HOME}/.aspnet/https`;
 
-// @ts-ignore
 const certificateArg = process.argv.map(arg => arg.match(/--name=(?<value>.+)/i)).filter(Boolean)[0];
 const certificateName = certificateArg ? certificateArg!.groups!.value : "eproject3.client";
 
@@ -69,7 +68,7 @@ const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_H
     env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:5001';
 const apiUrl = process.env.NODE_ENV === 'development' ? target : ''
 const baseUrl = process.env.NODE_ENV === 'development'
-    ? "https://locahost:5173"
+    ? "https://localhost:5173"
     : process.env.DEPLOY_HOST ? `https://${process.env.DEPLOY_HOST}` : undefined
 
 // https://vitejs.dev/config/
@@ -114,8 +113,13 @@ export default defineConfig(async () => {
             proxy: {
                 '^/api': {
                     target,
-                    secure: false
+                    secure: false,
+                    changeOrigin: true
                 }
+            },
+            cors: {
+                origin: 'https://localhost:5173', // or use "*" only for dev
+                credentials: true
             },
             port: 5173,
             https: {
