@@ -1,5 +1,5 @@
 import type { Doc } from "vite-plugin-press"
-import React, { lazy, Suspense, useState, ReactNode, MouseEvent } from 'react'
+import React, { lazy, Suspense, useState, ReactNode, MouseEvent, useContext } from 'react'
 import { PressContext } from "@/contexts"
 import { cn } from "@/utils"
 import LiteYouTube from "./LiteYouTube"
@@ -153,20 +153,33 @@ type Props = {
     type: string
     group?: string
 }
-export default ({ doc, type, group }: Props): React.JSX.Element => {
-    const press = React.useContext(PressContext)
-
+export default function MarkdownComponent({ doc, type, group }: Props) {
+    const press      = useContext(PressContext)
     const components = (press.components as any)[type] || {}
+    const factory    = group
+        ? components[group]?.[doc.slug]
+        : components[doc.slug]
+    const Component  = lazy(factory
+        ? factory
+        : () => Promise.resolve(<></>))
 
-    const factory = (group
-        ? components[group] && components[group][doc.slug]
-        : components[doc.slug])
+    // force everything to wrap and hide horizontal overflow
+    const wrapperClass = cn(
+        'prose lg:prose-xl max-w-none mb-32',
+        'whitespace-pre-wrap break-words overflow-x-hidden'
+    )
 
-    const Component = lazy(factory ? factory : () => Promise.resolve(<></>))
-
-    return (factory
-        ? (<Suspense fallback={<></>}><Component components={Components} /></Suspense>)
-        : doc.preview
-            ? <div dangerouslySetInnerHTML={{ __html: doc.preview }}></div>
-            : <pre dangerouslySetInnerHTML={{ __html: doc.content }}></pre>)
+    return (
+        <div className={wrapperClass}>
+            {factory ? (
+                <Suspense fallback={null}>
+                    <Component components={Components} />
+                </Suspense>
+            ) : doc.preview ? (
+                <div dangerouslySetInnerHTML={{ __html: doc.preview }} />
+            ) : (
+                <pre dangerouslySetInnerHTML={{ __html: doc.content }} />
+            )}
+        </div>
+    )
 }

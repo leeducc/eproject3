@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import BlogTitle from "@/components/BlogTitle"
 import BlogPosts from "@/components/BlogPosts"
-import SrcPage from "@/components/SrcPage"
 import Layout from "@/components/Layout"
 import { client } from "@/gateway"
 import { GetNews, NewsDto } from "@/dtos"
@@ -94,9 +93,7 @@ export default function NewsIndexPage() {
                 </div>
             </div>
 
-            <div className="my-8 flex justify-center gap-x-4">
-                <SrcPage path="posts/index.tsx" />
-            </div>
+            
         </Layout>
     )
 }

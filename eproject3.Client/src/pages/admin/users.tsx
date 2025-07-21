@@ -1,58 +1,57 @@
 ﻿// src/pages/admin/users.tsx
-import { useState, useEffect, ChangeEvent, SyntheticEvent } from "react"
+import  {
+    useState,
+    useEffect,
+    ChangeEvent,
+    SyntheticEvent,
+    useMemo,
+} from "react"
 import { useNavigate } from "react-router-dom"
 import { client } from "@/gateway"
 import {
     QueryCustomUsers,
     CreateCustomUser,
     UpdateCustomUser,
-    SaveUserAuthRole
+    SaveUserAuthRole,
 } from "@/dtos"
 import Page from "@/components/LayoutPage"
-import {
-    Loading,
-    TextInput,
-    Checkbox
-} from "@/components/Form"
+import { Loading, TextInput } from "@/components/Form"
 import { Button } from "@/components/ui/button"
+import DataTable from "@/components/DataTable"
+import type { ColumnDef, RowModel, Table} from "@tanstack/react-table"
 
-// -----------------------------------------------------------------------------
-// Mirror of your CustomUser shape (returned by QueryCustomUsers.results)
-// -----------------------------------------------------------------------------
-type CustomUser = {
-    Id: number
-    UserName: string
-    Email: string
-    DisplayName?: string
-    Roles: string[]
-    BanStatus: boolean
-    CreatedDate: string
+//
+// Local interface for the shape of each user row:
+//
+interface CustomUser {
+    id: number
+    userName: string
+    email: string
+    displayName?: string
+    roles: string[]
+    banStatus: boolean
+    createdDate: string
 }
 
-// -----------------------------------------------------------------------------
-// Admin Users Page
-// -----------------------------------------------------------------------------
 export default function AdminUsersPage() {
     const navigate = useNavigate()
 
-    // --- State ---
-    const [users, setUsers]           = useState<CustomUser[] | null>(null)
-    const [loading, setLoading]       = useState(true)
-    const [error, setError]           = useState<string | null>(null)
+    // ─── State ────────────────────────────────────────────────────────────
+    const [users, setUsers] = useState<CustomUser[]>([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
-    // Search & Filter
     const [searchTerm, setSearchTerm] = useState("")
     const [filterRole, setFilterRole] = useState<"" | "User" | "Manager" | "Employee">("")
-    const [filterBan, setFilterBan]   = useState<"All" | "Active" | "Banned">("All")
+    const [filterBan, setFilterBan] = useState<"All" | "Active" | "Banned">("All")
 
-    // Create‑User modal
     const [showCreate, setShowCreate] = useState(false)
-    const [newName, setNewName]       = useState("")
-    const [newEmail, setNewEmail]     = useState("")
+    const [newName, setNewName] = useState("")
+    const [newEmail, setNewEmail] = useState("")
     const [newDisplay, setNewDisplay] = useState("")
-    const [newRole, setNewRole]       = useState<"Manager"|"Employee"|""|null>("")
+    const [newRole, setNewRole] = useState<"Manager" | "Employee" | "" | null>("")
 
-    // Load users on mount & after modal closes
+    // ─── Load users ────────────────────────────────────────────────────────
     useEffect(() => {
         loadUsers()
     }, [showCreate])
@@ -60,95 +59,115 @@ export default function AdminUsersPage() {
     async function loadUsers() {
         setLoading(true)
         try {
-            const res = await client.get(new QueryCustomUsers())
-            setUsers(res.results)
+            const {results} = await client.get(new QueryCustomUsers())
+            setUsers(results)
+            setError(null)
         } catch (e: any) {
-            setError(e.message || "Failed to load users")
+            setError(e.message)
         } finally {
             setLoading(false)
         }
     }
 
-    // Derived filtered list
-    const displayedUsers = (users || []).filter(u => {
-        const term = searchTerm.trim().toLowerCase()
-        const matchesSearch =
-            !term ||
-            u.UserName.toLowerCase().includes(term) ||
-            u.Email.toLowerCase().includes(term)
-
-        const matchesRole =
-            !filterRole ||
-            (filterRole === "User"
-                ? u.Roles.length === 0 || (u.Roles.length === 1 && u.Roles[0] === "User")
-                : u.Roles.includes(filterRole))
-
-        const matchesBan =
-            filterBan === "All" ||
-            (filterBan === "Banned" && u.BanStatus) ||
-            (filterBan === "Active" && !u.BanStatus)
-
-        return matchesSearch && matchesRole && matchesBan
-    })
-
-    // --- Handlers ---
-    const openCreate = () => {
-        setNewName("")
-        setNewEmail("")
-        setNewDisplay("")
-        setNewRole("")
-        setShowCreate(true)
+    // ─── Actions ──────────────────────────────────────────────────────────
+    async function handleBanToggle(u: CustomUser) {
+        await client.put(new UpdateCustomUser({id: u.id, banStatus: !u.banStatus}))
+        loadUsers()
     }
 
-    const handleCreate = async (e: SyntheticEvent) => {
+    function handleEdit(u: CustomUser) {
+        const isPlain =
+            u.roles.length === 0 ||
+            (u.roles.length === 1 && u.roles[0] === "User")
+        if (isPlain) {
+            alert("❌ You cannot edit a plain‑User account.")
+            return
+        }
+        navigate(`/admin/users/${u.id}/edit`)
+    }
+
+    async function handleCreate(e: SyntheticEvent<HTMLFormElement>) {
         e.preventDefault()
         try {
-            const createRes = await client.post(new CreateCustomUser({
-                UserName: newName,
-                Email: newEmail,
-                DisplayName: newDisplay,
-            }))
+            const {id} = await client.post(
+                new CreateCustomUser({
+                    userName: newName,
+                    email: newEmail,
+                    displayName: newDisplay,
+                })
+            )
             if (newRole) {
-                await client.post(new SaveUserAuthRole({
-                    UserAuthId: createRes.Id,
-                    Role: newRole
-                }))
+                await client.post(
+                    new SaveUserAuthRole({userAuthId: id, role: newRole})
+                )
             }
             setShowCreate(false)
         } catch (e: any) {
-            alert("Error creating user: " + e.message)
+            alert("Failed to create user: " + e.message)
         }
     }
 
-    const handleBanToggle = async (u: CustomUser) => {
-        try {
-            await client.put(new UpdateCustomUser({
-                Id: u.Id,
-                BanStatus: !u.BanStatus
-            }))
-            loadUsers()
-        } catch (e: any) {
-            alert("Failed to toggle ban: " + e.message)
-        }
-    }
+    // ─── Filtered data for the table ───────────────────────────────────────
+    const data = users.filter(u => {
+        const t = searchTerm.toLowerCase()
+        if (t && !u.userName.toLowerCase().includes(t) && !u.email.toLowerCase().includes(t))
+            return false
 
-    const handleEdit = (u: CustomUser) => {
-        const isPlainUser =
-            u.Roles.length === 0 ||
-            (u.Roles.length === 1 && u.Roles[0] === "User")
-        if (isPlainUser) {
-            alert("❌ You cannot edit a plain-User account.")
-            return
+        if (filterRole) {
+            const isUserOnly = u.roles.length === 0 || (u.roles.length === 1 && u.roles[0] === "User")
+            if (filterRole === "User" ? !isUserOnly : !u.roles.includes(filterRole))
+                return false
         }
-        navigate(`/admin/users/${u.Id}/edit`)
-    }
 
-    // --- Render ---
+        if (filterBan === "Active" && u.banStatus) return false
+        if (filterBan === "Banned" && !u.banStatus) return false
+
+        return true
+    })
+
+    // ─── Columns for DataTable ─────────────────────────────────────────────
+    const columns = useMemo<ColumnDef<CustomUser, any>[]>(() => [
+        {accessorKey: "userName", header: "Username"},
+        {accessorKey: "email", header: "Email"},
+        {
+            id: "roles",
+            header: "Roles",
+            cell: ({row}) => row.original.roles.join(", ") || "User",
+        },
+        {
+            id: "ban",
+            header: "Banned?",
+            cell: ({row}) => (row.original.banStatus ? "✔️" : "—"),
+        },
+        {
+            id: "actions",
+            header: "Actions",
+            cell: ({row}) => (
+                <div className="flex gap-2">
+                    <Button size="sm" onClick={() => handleBanToggle(row.original)}>
+                        {row.original.banStatus ? "Unban" : "Ban"}
+                    </Button>
+                    <Button
+                        size="sm"
+                        onClick={() => handleEdit(row.original)}
+                        disabled={
+                            row.original.roles.length === 0 ||
+                            (row.original.roles.length === 1 && row.original.roles[0] === "User")
+                        }
+                    >
+                        Edit
+                    </Button>
+                </div>
+            ),
+        },
+    ], [])
+
+    // ─── Render ─────────────────────────────────────────────────────────────
     return (
         <Page title="Manage Users" className="px-8 py-6">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between mb-4">
                 <h1 className="text-2xl font-bold">Users</h1>
-                <Button onClick={openCreate}>+ New User</Button>
+                <Button onClick={() => setShowCreate(true)}>+ New User</Button>
             </div>
 
             {/* Search & Filters */}
@@ -160,82 +179,45 @@ export default function AdminUsersPage() {
                     className="flex-1 min-w-[200px]"
                 />
 
-                <div>
-                    <label className="block text-sm font-medium mb-1">Role</label>
-                    <select
-                        value={filterRole}
-                        onChange={(e) => setFilterRole(e.target.value as any)}
-                        className="border rounded px-2 py-1"
-                    >
-                        <option value="">All Roles</option>
-                        <option value="User">User</option>
-                        <option value="Manager">Manager</option>
-                        <option value="Employee">Employee</option>
-                    </select>
-                </div>
+                <select
+                    value={filterRole}
+                    onChange={(e: ChangeEvent<HTMLSelectElement>) => setFilterRole(e.target.value as any)}
+                    className="border rounded px-2 py-1"
+                >
+                    <option value="">All Roles</option>
+                    <option value="User">User</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Employee">Employee</option>
+                </select>
 
-                <div>
-                    <label className="block text-sm font-medium mb-1">Status</label>
-                    <select
-                        value={filterBan}
-                        onChange={(e) => setFilterBan(e.target.value as any)}
-                        className="border rounded px-2 py-1"
-                    >
-                        <option value="All">All</option>
-                        <option value="Active">Active</option>
-                        <option value="Banned">Banned</option>
-                    </select>
-                </div>
+                <select
+                    value={filterBan}
+                    onChange={(e: ChangeEvent<HTMLSelectElement>) => setFilterBan(e.target.value as any)}
+                    className="border rounded px-2 py-1"
+                >
+                    <option value="All">All</option>
+                    <option value="Active">Active</option>
+                    <option value="Banned">Banned</option>
+                </select>
             </div>
 
-            {loading && <Loading text="Loading users…" />}
-            {error && <p className="text-red-600">{error}</p>}
+            {/* DataTable or Loading/Error */}
+            {loading ? (
+                <Loading text="Loading users…"/>
+            ) : error ? (
+                <p className="text-red-600">{error}</p>
+            ) : (
+                <DataTable data={data} columns={columns} stripedRows
+                           getCoreRowModel={function (table: Table<any>): () => RowModel<any> {
+                               throw new Error("Function not implemented.")
+                           }} />
+            )}
 
-            {/* Users Table */}
-            <table className="w-full table-auto border">
-                <thead className="bg-gray-100">
-                <tr>
-                    <th className="px-4 py-2">Username</th>
-                    <th className="px-4 py-2">Email</th>
-                    <th className="px-4 py-2">Roles</th>
-                    <th className="px-4 py-2">Banned?</th>
-                    <th className="px-4 py-2">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                {displayedUsers.map(u => {
-                    const isPlainUser =
-                        u.Roles.length === 0 ||
-                        (u.Roles.length === 1 && u.Roles[0] === "User")
-                    return (
-                        <tr key={u.Id} className="border-t">
-                            <td className="px-4 py-2">{u.UserName}</td>
-                            <td className="px-4 py-2">{u.Email}</td>
-                            <td className="px-4 py-2">{u.Roles.join(", ") || "User"}</td>
-                            <td className="px-4 py-2">{u.BanStatus ? "✔️" : "—"}</td>
-                            <td className="px-4 py-2 space-x-2">
-                                <Button size="sm" onClick={() => handleBanToggle(u)}>
-                                    {u.BanStatus ? "Unban" : "Ban"}
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    onClick={() => handleEdit(u)}
-                                    disabled={isPlainUser}
-                                >
-                                    Edit
-                                </Button>
-                            </td>
-                        </tr>
-                    )
-                })}
-                </tbody>
-            </table>
-
-            {/* Create User “Modal” */}
+            {/* Create User Modal */}
             {showCreate && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white rounded shadow-lg w-full max-w-md p-6 space-y-4">
-                        <h2 className="text-xl font-semibold">New User</h2>
+                    <div className="bg-white rounded p-6 w-full max-w-md">
+                        <h2 className="text-xl font-semibold mb-4">New User</h2>
                         <form onSubmit={handleCreate} className="space-y-4">
                             <TextInput
                                 label="Username"
@@ -243,7 +225,6 @@ export default function AdminUsersPage() {
                                 onChange={(e) => setNewName(e.target.value)}
                                 required
                             />
-
                             <TextInput
                                 label="Email"
                                 type="email"
@@ -251,30 +232,24 @@ export default function AdminUsersPage() {
                                 onChange={(e) => setNewEmail(e.target.value)}
                                 required
                             />
-
                             <TextInput
                                 label="Display Name"
                                 value={newDisplay}
                                 onChange={(e) => setNewDisplay(e.target.value)}
                             />
-
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Role</label>
-                                <select
-                                    value={newRole || ""}
-                                    onChange={(e) => {
-                                        const v = e.target.value as ""|"Manager"|"Employee"
-                                        setNewRole(v === "" ? null : v)
-                                    }}
-                                    className="border rounded px-2 py-1 w-full"
-                                >
-                                    <option value="">(User)</option>
-                                    <option value="Manager">Manager</option>
-                                    <option value="Employee">Employee</option>
-                                </select>
-                            </div>
-
-                            <div className="flex justify-end space-x-2">
+                            <select
+                                value={newRole || ""}
+                                onChange={(e) => {
+                                    const v = e.target.value as "" | "Manager" | "Employee"
+                                    setNewRole(v || null)
+                                }}
+                                className="border rounded px-2 py-1 w-full"
+                            >
+                                <option value="">(User)</option>
+                                <option value="Manager">Manager</option>
+                                <option value="Employee">Employee</option>
+                            </select>
+                            <div className="flex justify-end gap-2">
                                 <Button variant="secondary" onClick={() => setShowCreate(false)}>
                                     Cancel
                                 </Button>

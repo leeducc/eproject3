@@ -1,159 +1,170 @@
-import {useEffect, useRef, useState} from "react";
-import { useParams } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { useEffect, useRef, useState } from "react";
+import { useParams }                from "react-router-dom";
+import Header                        from "@/components/Header";
+import Footer                        from "@/components/Footer";
+import { toast }                     from "react-toastify";
+import { client }                    from "@/gateway";
+
+// Product + related
+import { GetProduct, ProductResponse } from "@/dtos";
+
+// Reviews
 import {
-    GetProduct,
-    GetReviews,
-    Product,
-    ReviewDto,
-    CreateReview,
-    DeleteReview,
-    AddToCart,
-    AddToCollection,       
-    CreateCollection
+    GetReviews, ReviewDto,
+    CreateReview, UpdateReview, DeleteReview
 } from "@/dtos";
-import { client } from "@/gateway";
-import { toast } from "react-toastify";
+
+// Collections
+import {
+    GetCollections, CollectionDto,
+    CreateCollection, AddToCollection
+} from "@/dtos";
+// Cart
+import { AddToCart } from "@/dtos";
 
 export default function ProductDetail() {
-    const { id } = useParams();
-    const productId = Number(id);
+    const { id }         = useParams<{ id: string }>();
+    const productId      = Number(id);
 
-    const [product, setProduct] = useState<Product | null>(null);
-    const [reviews, setReviews] = useState<ReviewDto[]>([]);
-    const [reviewText, setReviewText] = useState("");
-    const [rating, setRating] = useState(5);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [userReviewId, setUserReviewId] = useState<number | null>(null);
-    const [userId, setUserId] = useState<number | null>(null);
-    const [displayName, setDisplayName] = useState<string>("");
-    const [isAdding, setIsAdding] = useState(false);
-    const [collections, setCollections] = useState<string[]>([
-        "Favorites",
-        "Look Again"
-    ]);
-    const [isOpen, setIsOpen] = useState(false);
-    const [newName, setNewName] = useState("");
-    const dropdownRef = useRef<HTMLDivElement>(null);
+    // server responses
+    const [productResp, setProductResp] = useState<ProductResponse | null>(null);
+    const [reviews,       setReviews]    = useState<ReviewDto[]>([]);
+    const [collections,   setCollections] = useState<CollectionDto[]>([]);
+
+    // auth
+    const [isAuth,       setIsAuth]       = useState(false);
+    const [userId,       setUserId]       = useState<number | null>(null);
+    const [displayName,  setDisplayName]  = useState<string>("");
+
+    // review form
+    const [reviewText,       setReviewText]       = useState("");
+    const [rating,           setRating]           = useState(5);
+    const [isSubmitting,     setIsSubmitting]     = useState(false);
+    const [editingReviewId,  setEditingReviewId]  = useState<number | null>(null);
+
+    // collections dropdown
+    const [isOpen,      setIsOpen]      = useState(false);
+    const [newCollName, setNewCollName] = useState("");
+    const dropdownRef   = useRef<HTMLDivElement>(null);
+
     const renderStars = (count: number) =>
-        "⭐️".repeat(count) + "☆".repeat(5 - count);
+        "★".repeat(count) + "☆".repeat(5 - count);
 
+    // — auth
     const loadAuth = async () => {
         try {
-            const res = await fetch("https://localhost:5001/auth", {
+            const res  = await fetch("https://localhost:5001/auth", {
                 credentials: "include",
-                headers: {
-                    Accept: "application/json"
-                }
+                headers:     { Accept: "application/json" },
             });
-
             const data = await res.json();
-            console.log("Auth session:", data); 
-
             if (res.ok) {
-                setIsAuthenticated(true);
+                setIsAuth(true);
                 setUserId(data.userId);
                 setDisplayName(data.displayName || data.userName || "You");
-            } else {
-                setIsAuthenticated(false);
             }
-        } catch (err) {
-            console.error("Auth error:", err);
-            setIsAuthenticated(false);
+        } catch {
+            setIsAuth(false);
         }
     };
 
-
+    // — product
     const loadProduct = async () => {
         try {
             const res = await client.get(new GetProduct({ id: productId }));
-            setProduct(res.product);
+            setProductResp(res);
         } catch {
             toast.error("Failed to load product");
         }
     };
 
+    // — reviews
     const loadReviews = async () => {
         try {
             const res = await client.get(new GetReviews({ productId }));
-            setReviews(res.reviews || []);
-
-            const userReview = res.reviews?.find(r => r.userId === userId);
-            if (userReview) {
-                setUserReviewId(userReview.id);
-                setReviewText(userReview.reviewText);
-                setRating(userReview.rating);
+            setReviews(res.reviews ?? []);
+            const mine = res.reviews?.find((r) => r.userId === userId);
+            if (mine) {
+                setEditingReviewId(mine.id);
+                setReviewText(mine.reviewText);
+                setRating(mine.rating);
             }
         } catch {
             toast.error("Failed to load reviews");
         }
     };
 
-    const handleReviewSubmit = async () => {
-        if (!isAuthenticated) return toast.warning("Please login to submit a review");
-        if (!reviewText.trim()) return;
+    // — collections
+    const loadCollections = async () => {
+        try {
+            const res = await client.get(new GetCollections({}));
+            setCollections(res.collections ?? []);
+        } catch {
+            toast.error("Failed to load your collections");
+        }
+    };
 
+    // — create or update review
+    const handleSaveReview = async () => {
+        if (!isAuth) {
+            toast.warning("Please log in to submit a review");
+            return;
+        }
         setIsSubmitting(true);
         try {
-            await client.post(new CreateReview({
-                productId,
-                rating,
-                reviewText
-            }));
-            toast.success("Review submitted");
-            await loadReviews();
+            if (editingReviewId) {
+                await client.put(new UpdateReview({
+                    id:          editingReviewId,
+                    rating,
+                    reviewText,
+                }));
+            } else {
+                await client.post(new CreateReview({
+                    productId,
+                    rating,
+                    reviewText,
+                }));
+            }
+            toast.success("Review saved");
             setReviewText("");
             setRating(5);
-        } catch (err: any) {
-            const msg = err?.responseStatus?.message || "Failed to submit review";
-            toast.error(msg.includes("already") ? "You've already reviewed" : msg);
+            setEditingReviewId(null);
+            await loadReviews();
+        } catch {
+            toast.error("Failed to save review");
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const handleDelete = async () => {
-        if (!userReviewId) return;
+    // — delete review
+    const handleDeleteReview = async () => {
+        if (!editingReviewId) return;
         try {
-            await client.delete(new DeleteReview({ id: userReviewId }));
+            await client.delete(new DeleteReview({ id: editingReviewId }));
             toast.success("Review deleted");
-            await loadReviews();
-            setUserReviewId(null);
+            setEditingReviewId(null);
             setReviewText("");
             setRating(5);
+            await loadReviews();
         } catch {
             toast.error("Failed to delete review");
         }
     };
 
+    // — initial load
     useEffect(() => {
-        if (productId) {
-            loadAuth().then(() => {
-                loadProduct();
-                loadReviews();
-            });
-        }
+        const init = async () => {
+            await loadAuth();         // <-- now userId is set
+            await loadProduct();
+            await loadCollections();
+            await loadReviews();      // <-- reviews now know your userId
+        };
+        void init();
     }, [productId]);
-    const handleAddToCart = async () => {
-        if (!product) return;
-        setIsAdding(true);
-        try {
-            // quantity hard‑coded to 1 for now
-            await client.post(new AddToCart({
-                productId: product.id,
-                quantity: 1
-            }));
-            toast.success("Added to cart!");
-        } catch (err: any) {
-            toast.error(err?.responseStatus?.message || "Failed to add to cart");
-        } finally {
-            setIsAdding(false);
-        }
-    };
+
+    // — click‑outside to close dropdown
     useEffect(() => {
-        // Close menu on outside click
         const onClick = (e: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
                 setIsOpen(false);
@@ -163,158 +174,172 @@ export default function ProductDetail() {
         return () => window.removeEventListener("mousedown", onClick);
     }, []);
 
-    const handleAddToCollection = async (name: string) => {
-        try {
-            await client.post(new AddToCollection({ productId, name: name }));
-            toast.success(`Added to “${name}”`);
-        } catch {
-            toast.error("Failed to add to collection");
-        } finally {
-            setIsOpen(false);
-        }
-    };
+    if (!productResp) {
+        return (
+            <div className="flex items-center justify-center h-64 text-gray-500">
+                Loading…
+            </div>
+        );
+    }
 
-    const handleCreateCollection = async () => {
-        if (!newName.trim()) return;
-        try {
-            await client.post(new CreateCollection({ name: newName }));
-            setCollections(c => [newName, ...c]);
-            toast.success(`Collection “${newName}” created`);
-            setNewName("");
-        } catch {
-            toast.error("Failed to create collection");
-        }
-    };
-
-    if (!product) return <div className="text-center py-10">Loading...</div>;
-
-    const avgRating = reviews.length
-        ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
-        : null;
+    const { product, genres, creator, reviewCount, averageRating } = productResp;
 
     return (
         <>
             <Header />
-            <div className="max-w-6xl mx-auto px-4 py-8">
-                {/* Product Info */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <img
-                        src={`https://localhost:5001/${product.image}`}
-                        alt={product.title}
-                        className="w-full rounded shadow"
-                    />
-                    <div>
-                        <h1 className="text-3xl font-bold mb-2">{product.title}</h1>
-                        <p className="text-gray-600 mb-1">By ID: {product.creatorId}</p>
-                        <p className="text-sm text-gray-500 mb-1">Category: {product.genre}</p>
-                        {avgRating && <p className="text-yellow-600 mb-1">⭐ {avgRating} / 5</p>}
-                        <p className="text-2xl text-red-600 font-semibold mb-4">
-                            {product.price.toLocaleString()}₫
-                        </p>
-                        <p className="whitespace-pre-line text-gray-700">{product.description}</p>
-                        <button
-                            className={`mt-6 w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition
-                          ${isAdding ? "opacity-50 cursor-not-allowed" : ""}`}
-                            onClick={handleAddToCart}
-                            disabled={isAdding}
-                        >
-                            {isAdding ? "Adding…" : "Add to Cart"}
-                        </button>
-                        {/* Add to Collection */}
-                        <div className="relative" ref={dropdownRef}>
-                            <button
-                                onClick={() => setIsOpen(o => !o)}
-                                className="flex items-center space-x-1 border rounded px-3 py-2 hover:bg-gray-100 transition"
-                            >
-                                <svg
-                                    className="w-5 h-5 text-gray-600"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                >
-                                    <path d="M4 6h16M4 12h8m-8 6h16"/>
-                                </svg>
-                                <span className="text-gray-700">Add to Collection</span>
-                                <svg
-                                    className={`w-4 h-4 text-gray-500 transform ${isOpen ? "rotate-180" : ""}`}
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                >
-                                    <path d="M19 9l-7 7-7-7"/>
-                                </svg>
-                            </button>
+            <main className="max-w-5xl mx-auto px-4 py-8 space-y-12">
 
-                            {isOpen && (
-                                <div className="absolute right-0 mt-2 w-56 bg-white border rounded shadow-lg z-10">
-                                    <ul className="divide-y">
-                                        {collections.map(name => (
-                                            <li key={name}>
-                                                <button
-                                                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                                                    onClick={() => handleAddToCollection(name)}
-                                                >
-                                                    {name}
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    <div className="px-4 py-2">
-                                        <input
-                                            type="text"
-                                            value={newName}
-                                            onChange={e => setNewName(e.target.value)}
-                                            placeholder="New collection"
-                                            className="w-full border rounded px-2 py-1 mb-2"
-                                        />
-                                        <button
-                                            onClick={handleCreateCollection}
-                                            className="w-full bg-indigo-600 text-white px-2 py-1 rounded hover:bg-indigo-700 transition"
-                                        >
-                                            + Create Collection
-                                        </button>
+                {/* Product Info */}
+                <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="rounded-lg overflow-hidden shadow-lg">
+                        <img
+                            src={`https://localhost:5001/${product.image}`}
+                            alt={product.title}
+                            className="w-full object-cover"
+                        />
+                    </div>
+                    <div className="flex flex-col justify-between space-y-4">
+                        <div>
+                            <h1 className="text-4xl font-extrabold">{product.title}</h1>
+                            <p className="text-gray-600">
+                                By <span className="font-medium">{creator.name}</span>
+                            </p>
+                            <p className="text-sm text-gray-500">
+                                Gernres:{" "}
+                                <span className="font-medium">
+                  {genres.map((g) => g.name).join(", ")}
+                </span>
+                            </p>
+                            {reviewCount > 0 && (
+                                <div className="flex items-center space-x-2">
+                                    <div className="text-yellow-500 text-lg">
+                                        {renderStars(Math.round(averageRating))}
                                     </div>
+                                    <span className="text-gray-600">
+                    {averageRating.toFixed(1)} ({reviewCount} reviews)
+                  </span>
                                 </div>
                             )}
+                            <p className="text-gray-700 whitespace-pre-line">
+                                {product.description}
+                            </p>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="space-y-4">
+                            <button
+                                onClick={async () => {
+                                    try {
+                                        await client.post(new AddToCart({ productId, quantity: 1 }));
+                                        toast.success("Added to cart");
+                                    } catch {
+                                        toast.error("Failed to add to cart");
+                                    }
+                                }}
+                                className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                            >
+                                Add to Cart
+                            </button>
+
+                            {/* Collection dropdown */}
+                            <div className="relative" ref={dropdownRef}>
+                                <button
+                                    onClick={() => setIsOpen((o) => !o)}
+                                    className="w-full flex justify-between items-center py-3 px-4 border rounded-lg hover:shadow transition"
+                                >
+                                    <span>Add to Collection</span>
+                                    <span className={`transform ${isOpen ? "rotate-180" : ""}`}>
+                    ▼
+                  </span>
+                                </button>
+                                {isOpen && (
+                                    <div className="absolute right-0 mt-2 w-full bg-white border rounded-lg shadow-lg z-20">
+                                        <ul className="divide-y">
+                                            {collections.map((c) => (
+                                                <li key={c.id}>
+                                                    <button
+                                                        onClick={async () => {
+                                                            await client.post(new AddToCollection({
+                                                                name:      c.name,
+                                                                productId,
+                                                            }));
+                                                            toast.success(`Added to “${c.name}”`);
+                                                            setIsOpen(false);
+                                                        }}
+                                                        className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                                                    >
+                                                        {c.name}
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <div className="p-4">
+                                            <input
+                                                type="text"
+                                                placeholder="New collection"
+                                                value={newCollName}
+                                                onChange={(e) => setNewCollName(e.target.value)}
+                                                className="w-full border rounded-lg px-3 py-2 mb-2 focus:ring"
+                                            />
+                                            <button
+                                                onClick={async () => {
+                                                    if (!newCollName.trim()) return;
+                                                    const newColl = await client.post(
+                                                        new CreateCollection({ name: newCollName })
+                                                    );
+                                                    setCollections([newColl, ...collections]);
+                                                    toast.success(`Collection “${newCollName}” created`);
+                                                    setNewCollName("");
+                                                }}
+                                                className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                                            >
+                                                + Create
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-                    </div>
-                </div>
+                </section>
 
                 {/* Reviews */}
-                <div className="mt-12">
-                    <h2 className="text-2xl font-bold mb-4">Reviews</h2>
+                <section className="space-y-6">
+                    <h2 className="text-2xl font-bold border-b pb-2">Reviews</h2>
+
+                    {/* List */}
                     {reviews.length === 0 ? (
-                        <p className="text-gray-500">No reviews yet.</p>
+                        <p className="text-gray-500">No reviews yet. Be the first!</p>
                     ) : (
                         <div className="space-y-4">
-                            {reviews.map((review, index) => (
-                                <div
-                                    key={review.id ?? `review-${index}`}
-                                    className={`p-4 rounded shadow ${review.userId === userId
-                                        ? "bg-yellow-50 border border-yellow-300"
-                                        : "bg-white"
-                                    }`}
-                                >
-                                    <div className="font-medium">
-                                        {review.userId === userId ? displayName : review.userEmail}
+                            {reviews.map((r) => (
+                                <div key={r.id} className="p-4 bg-white rounded-lg shadow">
+                                    <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium">
+                      {r.userId === userId ? displayName : r.userEmail}
+                    </span>
+                                        <span className="text-yellow-500">
+                      {renderStars(r.rating)}
+                    </span>
                                     </div>
-
-                                    <div className="text-yellow-500">{renderStars(review.rating)}</div>
-                                    <div className="text-gray-700 mt-1 whitespace-pre-line">
-                                        {review.reviewText}
-                                    </div>
-                                    {review.userId === userId && (
-                                        <div className="mt-2 space-x-2">
+                                    <p className="text-gray-700 whitespace-pre-line">
+                                        {r.reviewText}
+                                    </p>
+                                    {r.userId === userId && (
+                                        <div className="mt-2 flex space-x-4 text-sm">
                                             <button
                                                 onClick={() => {
-                                                    setReviewText(review.reviewText);
-                                                    setRating(review.rating);
-                                                    setUserReviewId(review.id);
+                                                    setEditingReviewId(r.id);
+                                                    setReviewText(r.reviewText);
+                                                    setRating(r.rating);
                                                 }}
-                                                className="text-sm text-blue-600 hover:underline"
+                                                className="text-blue-600 hover:underline"
                                             >
                                                 Edit
                                             </button>
                                             <button
-                                                onClick={handleDelete}
-                                                className="text-sm text-red-600 hover:underline"
+                                                onClick={handleDeleteReview}
+                                                className="text-red-600 hover:underline"
                                             >
                                                 Delete
                                             </button>
@@ -324,47 +349,53 @@ export default function ProductDetail() {
                             ))}
                         </div>
                     )}
-                </div>
 
-                {/* Write Review */}
-                <div className="mt-12">
-                    <h3 className="text-xl font-semibold mb-2">
-                        {userReviewId ? "Update Your Review" : "Write a Review"}
-                    </h3>
-                    {isAuthenticated ? (
-                        <div className="space-y-2">
-                            <textarea
-                                value={reviewText}
-                                onChange={(e) => setReviewText(e.target.value)}
-                                rows={4}
-                                className="w-full border p-2 rounded"
-                                placeholder="Write your honest opinion..."
-                            />
-                            <div>
-                                <label className="mr-2 font-medium">Rating:</label>
-                                <select
-                                    value={rating}
-                                    onChange={(e) => setRating(Number(e.target.value))}
-                                    className="border p-1 rounded"
-                                >
-                                    {[5, 4, 3, 2, 1].map(r => (
-                                        <option key={r} value={r}>{renderStars(r)}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <button
-                                onClick={handleReviewSubmit}
-                                disabled={isSubmitting}
-                                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                    {/* Write/Edit Form */}
+                    <div className="p-6 bg-gray-50 rounded-lg">
+                        <h3 className="text-xl font-semibold mb-4">
+                            {editingReviewId ? "Update Your Review" : "Write a Review"}
+                        </h3>
+                        <textarea
+                            rows={4}
+                            className="w-full border rounded-lg p-3 mb-4 focus:ring"
+                            placeholder="Share your thoughts…"
+                            value={reviewText}
+                            onChange={(e) => setReviewText(e.target.value)}
+                        />
+                        <div className="flex items-center mb-4">
+                            <label className="mr-4 font-medium">Rating:</label>
+                            <select
+                                value={rating}
+                                onChange={(e) => setRating(+e.target.value)}
+                                className="border rounded-lg p-2"
                             >
-                                {userReviewId ? "Update Review" : "Submit Review"}
-                            </button>
+                                {[5, 4, 3, 2, 1].map((n) => (
+                                    <option key={n} value={n}>
+                                        {renderStars(n)}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
-                    ) : (
-                        <p className="text-gray-500">Please login to submit a review.</p>
-                    )}
-                </div>
-         
+                        <button
+                            onClick={handleSaveReview}
+                            disabled={isSubmitting}
+                            className={`px-6 py-3 rounded-lg font-semibold transition
+                ${
+                                isSubmitting
+                                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                                    : "bg-green-600 text-white hover:bg-green-700"
+                            }
+              `}
+                        >
+                            {isSubmitting
+                                ? "Saving…"
+                                : editingReviewId
+                                    ? "Update Review"
+                                    : "Submit Review"}
+                        </button>
+                    </div>
+                </section>
+            </main>
             <Footer />
         </>
     );

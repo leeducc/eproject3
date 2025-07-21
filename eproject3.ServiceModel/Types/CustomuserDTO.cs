@@ -3,17 +3,18 @@ using ServiceStack.Auth;
 
 namespace eproject3.ServiceModel.Types;
 // --------- AutoQuery CRUD DTOs ----------
-[Route("/customusers", "GET")]
+[Route("/api/QueryCustomUsers", "GET")] 
+[Route("/api/customusers", "GET")]
 public class QueryCustomUsers 
     : QueryDb<CustomUser>, IReturn<QueryResponse<CustomUser>> 
 { }
 
-[Route("/customusers", "POST")]
+[Route("/api/customusers", "POST")]
 public class CreateCustomUser 
     : ICreateDb<CustomUser>, IReturn<CustomUser> 
 { }
 
-[Route("/customusers/{Id}", "PUT")]
+[Route("/api/customusers/{Id}", "PUT")]
 public class UpdateCustomUser 
     : IPatchDb<CustomUser>, IReturn<CustomUser> 
 {
@@ -27,6 +28,7 @@ public class UpdateCustomUser
 
 // --------- Assign a Role ----------
 [Route("/customuserroles", "POST")]
+[Route("/api/SaveUserAuthRole",  "POST")]
 public class SaveUserAuthRole 
     : ICreateDb<UserAuthRole>, IReturn<SaveUserAuthRoleResponse>
 {

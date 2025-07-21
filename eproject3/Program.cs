@@ -52,6 +52,8 @@ services.AddServiceStack(typeof(MyServices).Assembly);
 var app = builder.Build();
 
 
+app.UseCors("AllowFrontend");
+
 app.UseStaticFiles();
 var provider = new FileExtensionContentTypeProvider();
 
@@ -92,7 +94,7 @@ else
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowFrontend");
+
 
 
 

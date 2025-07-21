@@ -28,41 +28,48 @@ namespace eproject3.ServiceInterface
             return product;
         }
 
+      
         public object Get(GetProduct request)
         {
             var product = Db.SingleById<Product>(request.Id);
             if (product == null)
                 throw HttpError.NotFound($"Product with Id {request.Id} not found");
 
+            // load genres
             var genreIds = Db.Column<int>(
-                Db.From<ProductGenre>().Where(x => x.ProductId == request.Id).Select(x => x.GenreId)
-            );
-
+                Db.From<ProductGenre>()
+                    .Where(pg => pg.ProductId == request.Id)
+                    .Select(pg => pg.GenreId));
             var genres = Db.Select<Genre>(g => genreIds.Contains(g.Id));
 
+            // load creator
+            var creator = Db.Single<Creator>(c => c.Id == product.CreatorId);
+
+            // promotions & ratings…
             var now = DateTime.UtcNow;
             var activePromotion = Db.Single<Promotion>(p =>
                 p.ProductId == request.Id &&
                 p.StartDate <= now &&
-                p.EndDate >= now);
+                p.EndDate   >= now);
 
             var avgRating = Db.Scalar<double?>(
-                "SELECT AVG(Rating) FROM reviews WHERE ProductId = @productId",
-                new { productId = request.Id }) ?? 0;
+                "SELECT AVG(Rating) FROM reviews WHERE ProductId = @id",
+                new { id = request.Id }) ?? 0;
 
             var reviewCount = Db.Scalar<int>(
-                "SELECT COUNT(*) FROM reviews WHERE ProductId = @productId",
-                new { productId = request.Id });
+                "SELECT COUNT(*) FROM reviews WHERE ProductId = @id",
+                new { id = request.Id });
 
-            return new ProductResponse
-            {
-                Product = product,
-                Genres = genres,
+            return new ProductResponse {
+                Product         = product,
+                Genres          = genres,
+                Creator         = creator,
                 ActivePromotion = activePromotion,
-                AverageRating = (decimal)avgRating,
-                ReviewCount = reviewCount
+                AverageRating   = (decimal)avgRating,
+                ReviewCount     = reviewCount
             };
         }
+
 
         public object Get(QueryProducts request)
         {

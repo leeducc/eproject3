@@ -1,5 +1,5 @@
 /* Options:
-Date: 2025-07-21 08:01:09
+Date: 2025-07-22 09:13:14
 Version: 8.80
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: https://localhost:5001
@@ -41,6 +41,14 @@ export interface IHasBearerToken
     bearerToken?: string;
 }
 
+export interface ICreateDb<Table>
+{
+}
+
+export interface IPatchDb<Table>
+{
+}
+
 export interface IGet
 {
 }
@@ -64,6 +72,115 @@ export enum CreatorType
     Artist = 'Artist',
     Producer = 'Producer',
     Studio = 'Studio',
+}
+
+// @DataContract
+export class QueryBase
+{
+    // @DataMember(Order=1)
+    public skip?: number;
+
+    // @DataMember(Order=2)
+    public take?: number;
+
+    // @DataMember(Order=3)
+    public orderBy: string;
+
+    // @DataMember(Order=4)
+    public orderByDesc: string;
+
+    // @DataMember(Order=5)
+    public include: string;
+
+    // @DataMember(Order=6)
+    public fields: string;
+
+    // @DataMember(Order=7)
+    public meta: { [index:string]: string; };
+
+    public constructor(init?: Partial<QueryBase>) { (Object as any).assign(this, init); }
+}
+
+export class QueryDb<T> extends QueryBase
+{
+
+    public constructor(init?: Partial<QueryDb<T>>) { super(init); (Object as any).assign(this, init); }
+}
+
+export class UserAuth
+{
+    public id: number;
+    public userName: string;
+    public email: string;
+    public primaryEmail: string;
+    public phoneNumber: string;
+    public firstName: string;
+    public lastName: string;
+    public displayName: string;
+    public company: string;
+    public birthDate?: string;
+    public birthDateRaw: string;
+    public address: string;
+    public address2: string;
+    public city: string;
+    public state: string;
+    public country: string;
+    public culture: string;
+    public fullName: string;
+    public gender: string;
+    public language: string;
+    public mailAddress: string;
+    public nickname: string;
+    public postalCode: string;
+    public timeZone: string;
+    public salt: string;
+    public passwordHash: string;
+    public digestHa1Hash: string;
+    public roles: string[];
+    public permissions: string[];
+    public createdDate: string;
+    public modifiedDate: string;
+    public invalidLoginAttempts: number;
+    public lastLoginAttempt?: string;
+    public lockedDate?: string;
+    public recoveryToken: string;
+    public refId?: number;
+    public refIdStr: string;
+    public meta: { [index:string]: string; };
+
+    public constructor(init?: Partial<UserAuth>) { (Object as any).assign(this, init); }
+}
+
+export class CustomUser extends UserAuth
+{
+    public emailConfirmed?: boolean;
+    public banStatus?: boolean;
+    public phoneNumber?: string;
+    public city?: string;
+    public country?: string;
+    public address?: string;
+    public gender?: string;
+    public birthDate?: string;
+    public firstName?: string;
+    public lastName?: string;
+    public profileImageUrl?: string;
+
+    public constructor(init?: Partial<CustomUser>) { super(init); (Object as any).assign(this, init); }
+}
+
+export class UserAuthRole
+{
+    public id: number;
+    public userAuthId: number;
+    public role: string;
+    public permission: string;
+    public createdDate: string;
+    public modifiedDate: string;
+    public refId?: number;
+    public refIdStr: string;
+    public meta: { [index:string]: string; };
+
+    public constructor(init?: Partial<UserAuthRole>) { (Object as any).assign(this, init); }
 }
 
 /** @description Sign Up */
@@ -183,6 +300,27 @@ export class CollectionItemDto
     public addedAt: string;
 
     public constructor(init?: Partial<CollectionItemDto>) { (Object as any).assign(this, init); }
+}
+
+// @DataContract
+export class QueryResponse<T>
+{
+    // @DataMember(Order=1)
+    public offset: number;
+
+    // @DataMember(Order=2)
+    public total: number;
+
+    // @DataMember(Order=3)
+    public results: T[];
+
+    // @DataMember(Order=4)
+    public meta: { [index:string]: string; };
+
+    // @DataMember(Order=5)
+    public responseStatus: ResponseStatus;
+
+    public constructor(init?: Partial<QueryResponse<T>>) { (Object as any).assign(this, init); }
 }
 
 export class Promotion
@@ -543,6 +681,13 @@ export class QueryCreatorsResponse
     public constructor(init?: Partial<QueryCreatorsResponse>) { (Object as any).assign(this, init); }
 }
 
+export class SaveUserAuthRoleResponse
+{
+    public id?: number;
+
+    public constructor(init?: Partial<SaveUserAuthRoleResponse>) { (Object as any).assign(this, init); }
+}
+
 export class Genre
 {
     public id: number;
@@ -652,6 +797,7 @@ export class GetPostsResponse
 export class ProductResponse
 {
     public product: Product;
+    public creator: Creator;
     public genres: Genre[] = [];
     public activePromotion: Promotion;
     public averageRating: number;
@@ -1350,6 +1496,54 @@ export class DeleteCreator implements IReturnVoid
     public createResponse() {}
 }
 
+// @Route("/api/QueryCustomUsers", "GET")
+// @Route("/api/customusers", "GET")
+export class QueryCustomUsers extends QueryDb<CustomUser> implements IReturn<QueryResponse<CustomUser>>
+{
+
+    public constructor(init?: Partial<QueryCustomUsers>) { super(init); (Object as any).assign(this, init); }
+    public getTypeName() { return 'QueryCustomUsers'; }
+    public getMethod() { return 'GET'; }
+    public createResponse() { return new QueryResponse<CustomUser>(); }
+}
+
+// @Route("/api/customusers", "POST")
+export class CreateCustomUser implements IReturn<CustomUser>, ICreateDb<CustomUser>
+{
+
+    public constructor(init?: Partial<CreateCustomUser>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'CreateCustomUser'; }
+    public getMethod() { return 'POST'; }
+    public createResponse() { return new CustomUser(); }
+}
+
+// @Route("/api/customusers/{Id}", "PUT")
+export class UpdateCustomUser implements IReturn<CustomUser>, IPatchDb<CustomUser>
+{
+    public id: number;
+    public banStatus?: boolean;
+    public displayName?: string;
+    public email?: string;
+
+    public constructor(init?: Partial<UpdateCustomUser>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'UpdateCustomUser'; }
+    public getMethod() { return 'PUT'; }
+    public createResponse() { return new CustomUser(); }
+}
+
+// @Route("/customuserroles", "POST")
+// @Route("/api/SaveUserAuthRole", "POST")
+export class SaveUserAuthRole implements IReturn<SaveUserAuthRoleResponse>, ICreateDb<UserAuthRole>
+{
+    public userAuthId: number;
+    public role: string;
+
+    public constructor(init?: Partial<SaveUserAuthRole>) { (Object as any).assign(this, init); }
+    public getTypeName() { return 'SaveUserAuthRole'; }
+    public getMethod() { return 'POST'; }
+    public createResponse() { return new SaveUserAuthRoleResponse(); }
+}
+
 // @Route("/api/genres", "POST")
 export class CreateGenre implements IReturn<Genre>
 {
@@ -1481,8 +1675,10 @@ export class Hello implements IReturn<HelloResponse>, IGet
     public createResponse() { return new HelloResponse(); }
 }
 
-// @Route("/api/NewsDto", "GET")
-// @Route("/api/NewsDto/{Id}", "GET")
+// @Route("/api/news", "GET")
+// @Route("/api/GetNews", "GET")
+// @Route("/api/news/{Id}", "GET")
+// @Route("/api/GetNews/{Id}", "GET")
 export class GetNews implements IReturn<GetNewsResponse>
 {
     public id?: number;
@@ -1498,7 +1694,7 @@ export class GetNews implements IReturn<GetNewsResponse>
     public createResponse() { return new GetNewsResponse(); }
 }
 
-// @Route("/api/NewsDto", "POST")
+// @Route("/api/News", "POST")
 export class CreateNews implements IReturn<NewsDto>
 {
     public title: string;
@@ -1518,7 +1714,7 @@ export class CreateNews implements IReturn<NewsDto>
     public createResponse() { return new NewsDto(); }
 }
 
-// @Route("/api/NewsDto/{Id}", "PUT")
+// @Route("/api/News/{Id}", "PUT")
 export class UpdateNews implements IReturn<NewsDto>
 {
     public id: number;
@@ -1539,7 +1735,7 @@ export class UpdateNews implements IReturn<NewsDto>
     public createResponse() { return new NewsDto(); }
 }
 
-// @Route("/api/NewsDto/{Id}", "DELETE")
+// @Route("/api/News/{Id}", "DELETE")
 export class DeleteNews implements IReturnVoid
 {
     public id: number;

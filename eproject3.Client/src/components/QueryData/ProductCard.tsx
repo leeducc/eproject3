@@ -11,6 +11,8 @@ import {
     Creator,
     CreatorType,
 } from "@/dtos"
+import { AddToCart } from "@/dtos"
+import { toast } from "react-toastify"
 export default function ProductCardGrid() {
     const location = useLocation()
     const [products, setProducts] = useState<ProductView[]>([])
@@ -262,9 +264,24 @@ export default function ProductCardGrid() {
                                     ${product.price.toFixed(2)}
                                 </span>
                                     </p>
-                                    <button className="flex items-center rounded-md bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-700">
+                                    <button
+                                        onClick={async e => {
+                                            e.preventDefault();
+                                            try {
+                                                await client.post(new AddToCart({
+                                                    productId: product.id,
+                                                    quantity: 1,
+                                                }));
+                                                toast.success("Added to cart");
+                                            } catch {
+                                                toast.error("Failed to add to cart");
+                                            }
+                                        }}
+                                        className="flex items-center rounded-md bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-700"
+                                    >
                                         Add to cart
                                     </button>
+
                                 </div>
                             </div>
                         </Link>

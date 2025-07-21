@@ -23,11 +23,9 @@ public class AppHost() : AppHostBase("eproject3"), IHostingStartup
                     : null,
                 ApiBaseUrl = context.HostingEnvironment.IsDevelopment()
                     ? "https://localhost:5001"  
-                    : null,
-                AdminBaseUrl = context.HostingEnvironment.IsDevelopment()
-                    ? "https://localhost:5174"  
-                    : null,
+                    : null
             });
+            
         });
 
     

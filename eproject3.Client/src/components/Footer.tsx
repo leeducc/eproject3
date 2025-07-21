@@ -1,4 +1,10 @@
-import { Link } from "react-router-dom";
+import {Link, NavLink} from "react-router-dom";
+
+const category = location.pathname.startsWith("/game")
+    ? "game"
+    : location.pathname.startsWith("/movie")
+        ? "movie"
+        : "music";
 
 const Footer = () => {
     return (
@@ -16,9 +22,13 @@ const Footer = () => {
                     <h3 className="text-xl font-semibold mb-4">Quick Links</h3>
                     <ul className="space-y-2">
                         <li><Link to="/" className="hover:text-white">Home</Link></li>
-                        <li><Link to="/store" className="hover:text-white">Store</Link></li>
                         <li><Link to="/news" className="hover:text-white">News</Link></li>
-                        <li><Link to="/contact" className="hover:text-white">Contact</Link></li>
+                        <li><Link to="/forum" className="hover:text-white">Forum</Link></li>
+                        <li>
+                            <NavLink to={`/${category}/store`}>
+                                Store
+                            </NavLink>
+                        </li>
                     </ul>
                 </div>
 

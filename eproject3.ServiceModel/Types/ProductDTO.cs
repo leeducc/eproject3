@@ -32,6 +32,7 @@ namespace eproject3.ServiceModel.Types
     public class ProductResponse
     {
         public Product Product { get; set; }
+        public Creator       Creator         { get; set; } 
         public List<Genre> Genres { get; set; }
         public Promotion ActivePromotion { get; set; }
         public decimal AverageRating { get; set; }
